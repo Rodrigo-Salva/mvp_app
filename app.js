@@ -226,18 +226,36 @@ const ANIMS = {
 };
 
 // Palabras sueltas con gesto (para respuestas habladas o escritas libres).
-// Cualquier palabra que no esté aquí se DELETREA con el alfabeto dactilológico.
+// Se traduce PALABRA POR PALABRA: cada palabra conocida usa su gesto; solo las
+// términos sin gesto se deletrean con el alfabeto dactilológico.
 const WORD_GESTOS = {
-    hola: 'saludo', buenos: 'saludo', buenas: 'saludo', dias: 'saludo', tardes: 'saludo',
-    cita: 'cita', hora: 'hora', horas: 'hora', gracias: 'gracias', si: 'si', no: 'no',
-    espere: 'esperar', esperar: 'esperar', momento: 'esperar', pase: 'pase', pasar: 'pase',
-    firme: 'firmar', firmar: 'firmar', receta: 'firmar', dolor: 'dolor', duele: 'dolor',
-    fiebre: 'fiebre', medicina: 'medicina', medicinas: 'medicina', pastilla: 'medicina', pastillas: 'medicina',
-    doctor: 'pulso', doctora: 'pulso', medico: 'pulso', repita: 'repetir', repetir: 'repetir',
-    ayuda: 'ayuda', ayudar: 'ayuda', cuesta: 'dinero', precio: 'dinero', soles: 'dinero', pagar: 'dinero',
-    mareo: 'mareo', mareos: 'mareo', alergia: 'alergia', entiende: 'entender', entiendo: 'entender',
-    cambiar: 'cambiar', hoy: 'hoy', usted: 'tu', tu: 'tu', yo: 'yo', mi: 'yo'
+    hola: 'saludo', buenos: 'saludo', buenas: 'saludo', dias: 'saludo', tardes: 'saludo', noches: 'saludo',
+    cita: 'cita', citas: 'cita', turno: 'cita', hora: 'hora', horas: 'hora', dia: 'hoy', hoy: 'hoy',
+    gracias: 'gracias', si: 'si', claro: 'si', no: 'no', nada: 'no',
+    espere: 'esperar', esperar: 'esperar', espera: 'esperar', momento: 'esperar', minutos: 'esperar', favor: 'esperar', rato: 'esperar',
+    pase: 'pase', pasar: 'pase',
+    firme: 'firmar', firmar: 'firmar', firma: 'firmar', receta: 'firmar', documento: 'firmar', escrito: 'firmar',
+    dolor: 'dolor', duele: 'dolor',
+    fiebre: 'fiebre', calentura: 'fiebre', temperatura: 'fiebre',
+    medicina: 'medicina', medicinas: 'medicina', pastilla: 'medicina', pastillas: 'medicina', remedio: 'medicina', remedios: 'medicina', jarabe: 'medicina',
+    tomar: 'medicina', toma: 'medicina',
+    doctor: 'pulso', doctora: 'pulso', medico: 'pulso', medica: 'pulso', enfermero: 'pulso', enfermera: 'pulso', personal: 'pulso',
+    repita: 'repetir', repetir: 'repetir', repite: 'repetir',
+    ayuda: 'ayuda', ayudar: 'ayuda', auxilio: 'ayuda', apoyo: 'ayuda',
+    cuesta: 'dinero', precio: 'dinero', soles: 'dinero', pagar: 'dinero', pago: 'dinero', costo: 'dinero', cuanto: 'dinero',
+    mareo: 'mareo', mareos: 'mareo', mareada: 'mareo', mareado: 'mareo',
+    alergia: 'alergia', alergico: 'alergia', alergica: 'alergia',
+    entiendo: 'entender', entiende: 'entender', entender: 'entender', comprender: 'entender', comprende: 'entender',
+    cambiar: 'cambiar', cambio: 'cambiar', cambia: 'cambiar', cancela: 'cambiar',
+    usted: 'tu', tu: 'tu', yo: 'yo', mi: 'yo',
+    sordo: 'sordo', sorda: 'sordo',
+    pregunta: 'pregunta', preguntas: 'pregunta', duda: 'pregunta', dudas: 'pregunta',
+    grave: 'grave', serio: 'grave'
 };
+
+// Palabras de relleno (artículos, preposiciones, conjunciones y auxiliares) sin gesto:
+// se omiten para que la traducción sea palabra por palabra sin deletrear letras.
+const STOPWORDS = new Set(('el la los las un una unos unas de del a al y e o u en con por para que se te le les es son su sus esta este donde como cual pues pero mas ya bien aqui aqui no debe debo debes puede puedo cuando cada cuantas'.split(/\s+/)));
 
 // Alfabeto dactilológico ILUSTRATIVO: forma de los 5 dedos por letra (0 extendido, 1 doblado).
 const LETRAS = {
@@ -259,10 +277,10 @@ const S = {
     conversation: [],         // [{from, text, ts}] -> se borra al terminar
     settings: { fontSize: 'normal', highContrast: false, avatarSpeed: 1, voiceLang: 'es-PE', tts: true, ttsPatient: true },
     // paciente
-    pending: null,            // seña esperando confirmación
     cooldownUntil: 0,
     camToken: 0, camRunning: false, stream: null, hands: null,
-    avatar: null, lastStaff: null,
+    avatar: null, lastStaff: null, lastPatientText: null,
+    autoReplyTimer: 0, autoReplyIdx: 0, voiceTimer: 0,
     // personal
     recognition: null, listening: false, retriedLang: false,
     // conexión
@@ -454,7 +472,7 @@ const clamp01 = (x) => Math.max(0, Math.min(1, x));
                - confidence   = 0..1
                - fingers      = [bool x5] pulgar..meñique
      Un modelo entrenado devolvería el mismo objeto: así el resto
-     (estabilizador, confirmación, envío) no cambia.
+     (estabilizador y envío) no cambia.
 
    MÉTODO (por reglas): un dedo está extendido si la punta está más
    lejos de la muñeca que su articulación media. No depende de la
@@ -514,20 +532,20 @@ async function startCamera() {
     const token = ++S.camToken;
     const video = $('input-video');
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraStatus('Cámara no disponible. Usa el modo demostración.');
-        showMessage('Este navegador no permite usar la cámara. Abre la página con localhost o https. Puedes seguir con el modo demostración.', true);
+        setCameraStatus('Cámara no disponible. Usa las frases rápidas.');
+        showMessage('Este navegador no permite usar la cámara. Abre la página con localhost o https. Puedes seguir con las frases rápidas.', true);
         return;
     }
     setCameraStatus('Pidiendo permiso de cámara…');
     try {
-        S.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false });
+        S.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 960, height: 600 }, audio: false });
     } catch (err) {
         const msg = (err.name === 'NotAllowedError' || err.name === 'SecurityError')
-            ? 'No pudimos usar la cámara porque no se dio permiso. Permítela en el navegador. Mientras tanto usa el modo demostración.'
+            ? 'No pudimos usar la cámara porque no se dio permiso. Permítela en el navegador. Mientras tanto usa las frases rápidas.'
             : (err.name === 'NotFoundError' || err.name === 'OverconstrainedError')
-                ? 'No se encontró una cámara en este equipo. Usa el modo demostración.'
-                : 'No se pudo abrir la cámara (puede estar en uso por otra aplicación). Usa el modo demostración.';
-        setCameraStatus('Sin cámara. Usa el modo demostración o las frases rápidas.');
+                ? 'No se encontró una cámara en este equipo. Usa las frases rápidas.'
+                : 'No se pudo abrir la cámara (puede estar en uso por otra aplicación). Usa las frases rápidas.';
+        setCameraStatus('Sin cámara. Usa las frases rápidas.');
         showMessage(msg, true);
         return;
     }
@@ -536,14 +554,14 @@ async function startCamera() {
     try { await video.play(); } catch (e) { /* se reintenta con los cuadros */ }
 
     if (typeof Hands === 'undefined') {
-        setCameraStatus('Detector de manos no cargado (sin internet). Usa el modo demostración.');
-        showMessage('No se pudo cargar el detector de manos (necesita internet la primera vez). Usa el modo demostración.', true);
+        setCameraStatus('Detector de manos no cargado (sin internet). Usa las frases rápidas.');
+        showMessage('No se pudo cargar el detector de manos (necesita internet la primera vez). Usa las frases rápidas.', true);
         return;
     }
     try {
         setCameraStatus('Cargando detector de manos…');
         const hands = new Hands({ locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
+        hands.setOptions({ maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
         hands.onResults(onHandResults);
         await hands.initialize();
         if (token !== S.camToken) { hands.close(); return; }
@@ -558,8 +576,8 @@ async function startCamera() {
         loop();
     } catch (err) {
         console.error(err);
-        setCameraStatus('No se pudo iniciar el detector. Usa el modo demostración.');
-        showMessage('No se pudo iniciar el detector de manos. Usa el modo demostración.', true);
+        setCameraStatus('No se pudo iniciar el detector. Usa las frases rápidas.');
+        showMessage('No se pudo iniciar el detector de manos. Usa las frases rápidas.', true);
     }
 }
 
@@ -579,26 +597,49 @@ function onHandResults(results) {
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-    const lm = results.multiHandLandmarks && results.multiHandLandmarks[0];
-    if (lm && typeof drawConnectors !== 'undefined') {
-        drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#7ee0c3', lineWidth: 4 });
-        drawLandmarks(ctx, lm, { color: '#ffffff', fillColor: '#0b6e8a', lineWidth: 2, radius: 4 });
+    const handsList = (results.multiHandLandmarks || []).filter(lm => lm && lm.length >= 21);
+    if (typeof drawConnectors !== 'undefined') {
+        handsList.forEach(lm => {
+            drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#7ee0c3', lineWidth: 4 });
+            drawLandmarks(ctx, lm, { color: '#ffffff', fillColor: '#0b6e8a', lineWidth: 2, radius: 4 });
+        });
     }
     ctx.restore();
 
-    const res = lm ? recognizeSign(lm, signsFor(S.scenario), canvas.width / canvas.height) : null;
+    // Se leen las DOS manos y se elige la más clara (que coincida con una seña o de mayor confianza)
+    const aspect = canvas.width / canvas.height;
+    let res = null;
+    handsList.forEach(lm => {
+        const r = recognizeSign(lm, signsFor(S.scenario), aspect);
+        if (!r) return;
+        if (!res || handScore(r) > handScore(res)) res = r;
+    });
+
     let progress = 0;
-    if (!S.pending && Date.now() >= S.cooldownUntil) {
+    if (Date.now() >= S.cooldownUntil) {
         const out = stabilizer.push(res);
         progress = out.progress;
-        if (out.fired) proposeSign(out.fired.texto, out.fired.confidence);
+        if (out.fired) sendRecognizedSign(out.fired.texto);
     } else {
         stabilizer.reset();
     }
-    updateLiveBox(res, progress);
+    updateLiveBox(res, progress, handsList.length);
 }
 
-function updateLiveBox(res, progress) {
+// Prioriza una mano que coincida con una seña y luego la confianza del reconocimiento.
+function handScore(r) {
+    return (r.signId ? 10 : 0) + r.confidence;
+}
+
+/* Seña reconocida y estable: se envía SOLA (sin pedir confirmación).
+   Se aplica una pausa para que la seña termine antes de volver a leer. */
+function sendRecognizedSign(texto) {
+    S.cooldownUntil = Date.now() + 2500;
+    stabilizer.reset();
+    sendPatientMessage(texto);
+}
+
+function updateLiveBox(res, progress, handsCount = 0) {
     const box = $('live-fingers');
     box.innerHTML = '';
     FINGER_NAMES.forEach((name, i) => {
@@ -609,52 +650,145 @@ function updateLiveBox(res, progress) {
         box.appendChild(chip);
     });
     $('live-progress').value = Math.round(progress * 100);
-    let label = 'Sin mano a la vista';
-    if (res && res.signId) label = `✔ ${res.texto} (${Math.round(res.confidence * 100)}%)`;
+    let label = 'Sin manos a la vista';
+    if (res && res.signId) {
+        const n = handsCount > 1 ? ` · ${handsCount} manos` : '';
+        label = `✔ ${res.texto} (${Math.round(res.confidence * 100)}%)${n}`;
+    }
     else if (res) label = 'Forma de mano sin seña asignada';
     $('live-label').textContent = label;
 }
 
-/* ---------- Confirmación antes de enviar ---------- */
-function proposeSign(texto, confidence) {
-    if (S.pending) return;
-    S.pending = { texto, confidence };
-    const p = $('confirm-text');
-    p.textContent = '';
-    p.append('¿Quisiste decir: ');
-    const em = document.createElement('em'); em.textContent = texto; p.appendChild(em);
-    p.append('?');
-    const pct = Math.round(confidence * 100);
-    $('confirm-confidence').value = pct;
-    $('confirm-confidence-label').textContent = `${pct}% (${pct >= 75 ? 'alta' : pct >= 55 ? 'media' : 'baja'})`;
-    $('confirm-panel').classList.remove('hidden');
-    $('sent-status').classList.add('hidden');
-    $('btn-confirm-yes').focus();
-}
-
-function resolveConfirmation(accepted) {
-    if (!S.pending) return;
-    const { texto } = S.pending;
-    S.pending = null;
-    S.cooldownUntil = Date.now() + 2500;
-    stabilizer.reset();
-    $('confirm-panel').classList.add('hidden');
-    if (accepted) sendPatientMessage(texto);
-    else {
-        $('patient-current-text').textContent = 'Entendido, no se envió. Intenta otra vez.';
-        $('sent-status').classList.add('hidden');
-    }
-}
-
+/* Seña reconocida y enviada (sin confirmación). La voz se reproduce con un
+   pequeño retraso para que termine el gesto, y el avatar responde después. */
 function sendPatientMessage(texto) {
     $('patient-current-text').textContent = texto;
     const st = $('sent-status');
     st.innerHTML = ico('check') + (S.role === 'patient' && !peerConnected() ? ' Dicho al personal' : ' Enviado al personal');
     st.classList.remove('hidden');
+    S.lastPatientText = texto;
     Transport.send('PATIENT_MSG', { text: texto });
-    // Lo que dice el paciente se LEE EN VOZ ALTA aquí si no hay otra tablet del personal
-    // (si hay tablet del personal conectada, es esa tablet la que lo lee, según su interruptor).
-    if (S.role === 'patient' && S.settings.ttsPatient && !peerConnected()) speak(texto);
+    // Lo que dice el paciente se LEE EN VOZ ALTA aquí si no hay otra tablet del personal.
+    // La voz suena tras una pausa (para que el gesto termine), no al instante.
+    if (S.role === 'patient' && S.settings.ttsPatient && !peerConnected()) speakDelayed(texto);
+    scheduleAutoReply();
+}
+
+// Voz del paciente: se retrasa ~1.5 s para que termine la seña antes de sonar.
+function speakDelayed(text) {
+    clearTimeout(S.voiceTimer);
+    S.voiceTimer = setTimeout(() => {
+        if (!S.active) return;
+        speak(text);
+    }, 1500);
+}
+
+/* El avatar simula la respuesta del personal tras cada seña del paciente
+   cuando no hay un tablet real del personal conectado (solo pantalla o demo).
+   Cada área (recepción, consultorio, farmacia) responde con SU propio estilo:
+   `rules` son respuestas por palabra clave y `pool` la reserva para lo demás.
+   El texto de una regla puede ser una función (recibe la seña escrita). */
+const SYMPTOM_RE = /\b(fiebre|calentura|duele|dolor|mareos?|tos|cabeza|pecho|estomago|garganta|vomito|alergia)\b/;
+const SYMPTOM_LABEL = {
+    calentura: 'fiebre', duele: 'dolor',
+    tos: 'tos', cabeza: 'dolor de cabeza', pecho: 'dolor de pecho',
+    estomago: 'dolor de estómago', garganta: 'dolor de garganta', vomito: 'vómitos'
+};
+const SYMPTOM_ANIM = {
+    fiebre: 'fiebre', calentura: 'fiebre', dolor: 'dolor', duele: 'dolor',
+    mareo: 'mareos', mareos: 'mareos', alerta: 'mareos'
+};
+
+const AUTO_REPLIES = {
+    reception: {
+        rules: [
+            { re: /\bespecialista\b/, out: { text: 'Lo redirigiré al área de pediatría.', anim: 'pase' } },
+            { re: /\b(cambiar|cambio|reprogramar|mover|adelantar|atrasar)\b/, out: { text: 'Claro, puedo programarle otra cita.', anim: 'espere' } },
+            { re: /\b(cita|turno|hora|sacar|agendar)\b/, out: { text: 'Su cita a dermatología será dentro de 10 minutos.', anim: 'cita_a_las' } },
+            { re: /\b(sordo|ayuda|ayudar|no entiendo|entiendo|entender)\b/, out: { text: 'Le explico por escrito.', anim: 'escrito' } },
+            { re: /\b(repita|repetir)\b/, out: { text: '¿Puede repetir?', anim: 'repetir_staff' } },
+            { re: /\bgracias\b/, out: { text: 'De nada.', anim: 'gracias' } },
+            { re: /\bsi\b/, out: { text: 'Perfecto, lo anoto.', anim: 'si' } },
+            { re: /\bno\b/, out: { text: '¿Puede repetir?', anim: 'repetir_staff' } }
+        ],
+        pool: [
+            { text: 'Su cita a dermatología será dentro de 10 minutos.', anim: 'cita_a_las' },
+            { text: 'Lo redirigiré al área de pediatría.', anim: 'pase' },
+            { text: 'Espere un momento, por favor.', anim: 'espere' },
+            { text: '¿Puede repetir?', anim: 'repetir_staff' }
+        ]
+    },
+    consulting: {
+        rules: [
+            { re: /\b(es grave|grave|peligroso|preocup|serio)\b/, out: { text: 'Está bien de salud, tiene un buen nivel de sangre.', anim: null } },
+            { re: SYMPTOM_RE, out: (t) => {
+                const m = SYMPTOM_RE.exec(t);
+                const label = SYMPTOM_LABEL[m[1]] || m[1];
+                return { text: `Ha sido diagnosticado con ${label}.`, anim: SYMPTOM_ANIM[label] || SYMPTOM_ANIM[m[1]] || null };
+            } },
+            { re: /\b(medicina|medicamento|remedio|pastilla|tomar|jarabe)\b/, out: { text: 'Le receto un medicamento; se toma una pastilla cada ocho horas.', anim: 'medicina_que' } },
+            { re: /\b(cuando|vuelvo|volver|regresar)\b/, out: { text: 'Vuelva en una semana, por favor.', anim: 'cuando_vuelvo' } },
+            { re: /\balergia\b/, out: { text: 'Anotado su alergia. Le cambio el medicamento.', anim: 'alergia' } },
+            { re: /\b(no entiendo|entiendo|entender)\b/, out: { text: 'Le explico por escrito.', anim: 'escrito' } },
+            { re: /\bgracias\b/, out: { text: 'De nada, cuídese.', anim: 'gracias' } },
+            { re: /\bsi\b/, out: { text: 'Muy bien, siga así.', anim: 'si' } },
+            { re: /\bno\b/, out: { text: '¿Puede repetir?', anim: 'repetir_staff' } }
+        ],
+        pool: [
+            { text: 'Está bien de salud, tiene un buen nivel de sangre.', anim: null },
+            { text: 'Le receto un medicamento; se toma una pastilla cada ocho horas.', anim: 'medicina_que' },
+            { text: 'Vuelva en una semana, por favor.', anim: 'cuando_vuelvo' },
+            { text: '¿Puede repetir?', anim: 'repetir_staff' }
+        ]
+    },
+    pharmacy: {
+        rules: [
+            { re: /\breceta\b/, out: { text: 'Podría darme su receta médica, estimado(a).', anim: 'receta' } },
+            { re: /\b(recoger|medicinas?|medicamento|remedio)\b/, out: { text: 'Sí tenemos todos esos medicamentos, ahora lo empaquetamos.', anim: 'recoger_med' } },
+            { re: /\b(cuesta|precio|cuanto|costo|soles|pagar)\b/, out: { text: 'Son quince soles.', anim: 'costo' } },
+            { re: /\b(como se toma|tomar|toma|cuando se toma)\b/, out: { text: 'Se toma una pastilla cada ocho horas, después de comer.', anim: 'como_tomar' } },
+            { re: /\b(cada|horas)\b/, out: { text: 'Cada ocho horas, después de comer.', anim: 'cada_horas' } },
+            { re: /\b(presentacion|presentación)\b/, out: { text: 'Sí, tenemos jarabe en lugar de pastilla.', anim: 'otra_presentacion' } },
+            { re: /\b(sordo|ayuda|ayudar|no entiendo|entiendo)\b/, out: { text: 'Le explico por escrito.', anim: 'escrito' } },
+            { re: /\b(repita|repetir)\b/, out: { text: '¿Puede repetir?', anim: 'repetir_staff' } },
+            { re: /\bgracias\b/, out: { text: 'De nada, buen día.', anim: 'gracias' } },
+            { re: /\bsi\b/, out: { text: 'Perfecto, enseguida lo despacho.', anim: 'si' } },
+            { re: /\bno\b/, out: { text: '¿Puede repetir?', anim: 'repetir_staff' } }
+        ],
+        pool: [
+            { text: 'Sí tenemos todos esos medicamentos, ahora lo empaquetamos.', anim: 'recoger_med' },
+            { text: 'Podría darme su receta médica, estimado(a).', anim: 'receta' },
+            { text: 'Son quince soles.', anim: 'costo' },
+            { text: '¿Puede repetir?', anim: 'repetir_staff' }
+        ]
+    }
+};
+
+function pickAutoReply(patientText) {
+    const t = normalizeText(patientText || '');
+    const set = AUTO_REPLIES[S.scenario] || AUTO_REPLIES.reception;
+    for (const r of set.rules) {
+        if (!r.re.test(t)) continue;
+        const out = typeof r.out === 'function' ? r.out(t) : r.out;
+        return { text: out.text, anim: out.anim };
+    }
+    const pool = set.pool;
+    S.autoReplyIdx = (S.autoReplyIdx || 0) + 1;
+    return { ...pool[S.autoReplyIdx % pool.length] };
+}
+
+function scheduleAutoReply() {
+    clearTimeout(S.autoReplyTimer);
+    if (S.role === 'staff') return;
+    if (S.role === 'patient' && peerConnected()) return;   // el personal real va a responder
+    const panel = $('staff-response-text');
+    if (panel) panel.textContent = 'El personal está escribiendo…';
+    S.autoReplyTimer = setTimeout(() => {
+        if (!S.active || !S.avatar) return;
+        const reply = pickAutoReply(S.lastPatientText || '');
+        receiveStaffMessage(reply);
+        if (hasStaff()) appendChat('staff', reply.text);
+    }, 2800);
 }
 
 /* ============================================================
@@ -684,6 +818,28 @@ function makePose(armA, armB) {
 }
 const REST_POSE = makePose(REST_ARM, REST_ARM);
 
+/* Silueta de un dedo: polygon() de los puntos con un grosor por punta,
+   formando un trapezoide redondeado que se afina hacia la punta. */
+function fingerOutline(pts, widths) {
+    const n = pts.length;
+    if (n < 2) return '';
+    const perp = (i) => {
+        const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const L = Math.hypot(dx, dy) || 1;
+        return { x: -dy / L, y: dx / L };
+    };
+    const left = [], right = [];
+    for (let i = 0; i < n; i++) {
+        const p = pts[i], w = widths[i], nv = perp(i);
+        left.push(`${(p.x + nv.x * w).toFixed(2)},${(p.y + nv.y * w).toFixed(2)}`);
+        right.push(`${(p.x - nv.x * w).toFixed(2)},${(p.y - nv.y * w).toFixed(2)}`);
+    }
+    let d = `M${left[0]}L` + left.slice(1).join('L');
+    for (let i = n - 1; i >= 0; i--) d += `L${right[i]}`;
+    return d + 'Z';
+}
+
 /* Convierte un texto (o un animacion_id) en la lista de pasos del avatar.
    - Si hay animacion_id conocido: usa su secuencia de gestos.
    - Si no: recorre las palabras; con gesto conocido lo usa, si no DELETREA. */
@@ -706,7 +862,7 @@ function buildSteps(text, animId) {
         ANIMS[animId].forEach(addGesto);
     } else {
         const words = normalizeText(text).replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(Boolean);
-        words.forEach(w => { if (WORD_GESTOS[w]) addGesto(WORD_GESTOS[w]); else fingerspell(w); });
+        words.forEach(w => { if (WORD_GESTOS[w]) addGesto(WORD_GESTOS[w]); else if (!STOPWORDS.has(w)) fingerspell(w); });
     }
     const MAX = 60;                                         // evita secuencias interminables
     if (steps.length > MAX) steps.length = MAX;
@@ -714,6 +870,45 @@ function buildSteps(text, animId) {
     steps.question = /[?¿]/.test(text || '');
     return steps;
 }
+
+/* ------------------------------------------------------------
+   VESTIMENTA DEL AVATAR según el área de atención:
+   - reception: uniforme de recepcionista (polo + gafete)
+   - consulting: bata de doctor abierta + estetoscopio
+   - pharmacy: bata de científico cerrada, con botones y bolsillo
+   Cada función dibuja dentro del grupo `.av-outfit` (sobre el torso,
+   debajo de los brazos). Todas las formas son ilustrativas.
+   ------------------------------------------------------------ */
+const OUTFIT_TORSO = 'M116 165 Q116 118 160 116 L200 116 Q244 118 244 165 L244 330 L116 330 Z';
+const OUTFITS = {
+    reception(add) {
+        add('path', { class: 'of-top', d: OUTFIT_TORSO });
+        add('path', { class: 'of-line', d: 'M160 117 L180 146 L200 117' });          // escote en V del polo
+        add('path', { class: 'of-line', d: 'M160 117 L172 132 M200 117 L188 132' }); // ribete del cuello
+        add('path', { class: 'of-line', d: 'M196 122 L214 186' });                   // cordón del gafete
+        add('rect', { class: 'of-badge', x: 208, y: 184, width: 38, height: 26, rx: 5 });
+        add('path', { class: 'of-badge-line', d: 'M214 193h26 M214 200h18' });
+    },
+    consulting(add) {
+        add('path', { class: 'of-shirt', d: OUTFIT_TORSO });                         // camisa interior
+        add('path', { class: 'of-coat', d: 'M116 165 Q116 118 160 116 L180 152 L180 330 L116 330 Z' });
+        add('path', { class: 'of-coat', d: 'M244 165 Q244 118 200 116 L180 152 L180 330 L244 330 Z' });
+        add('path', { class: 'of-line', d: 'M160 116 L180 152 M200 116 L180 152' }); // abertura de la bata
+        add('path', { class: 'of-pocket', x: 206, y: 206, width: 32, height: 30, rx: 4 });
+        add('path', { class: 'of-pen', d: 'M218 200 L222 224' });
+        add('path', { class: 'of-steth', d: 'M166 119 C150 152 154 196 172 211' });
+        add('path', { class: 'of-steth', d: 'M196 119 C212 150 208 186 194 200' });
+        add('circle', { class: 'of-steth-head', cx: 176, cy: 214, r: 9 });
+    },
+    pharmacy(add) {
+        add('path', { class: 'of-coat', d: OUTFIT_TORSO });                          // bata cerrada
+        add('path', { class: 'of-line', d: 'M164 116 L180 138 L196 116' });          // cuello
+        add('path', { class: 'of-line', d: 'M180 138 L180 330' });                   // cierre central
+        [170, 205, 240, 275].forEach(y => add('circle', { class: 'of-btn', cx: 187, cy: y, r: 4.5 }));
+        add('rect', { class: 'of-pocket', x: 206, y: 210, width: 34, height: 34, rx: 4 });
+        add('path', { class: 'of-pen', d: 'M219 204 L222 230 M230 204 L233 226' });
+    }
+};
 
 class SignAvatar {
     constructor(container, { onStep, onState } = {}) {
@@ -727,6 +922,7 @@ class SignAvatar {
         this.raf = 0; this.last = 0;
         this._build();
         this._render(this.current);
+        this.setOutfit('reception');
     }
 
     /* ---- Dibujo base en SVG ---- */
@@ -765,25 +961,41 @@ class SignAvatar {
         this._el('ellipse', { class: 'av-face', cx: 195, cy: 61, rx: 3.8, ry: 4.6 }, eyes);
         this._el('path', { class: 'av-mouth', d: 'M169 80 Q180 89 191 80', fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round' }, head);
 
+        // Vestimenta según el área: recepción, consultorio o farmacia (se dibuja en setOutfit)
+        this.outfit = this._el('g', { class: 'av-outfit' }, body);
+
         // Brazos: manga, antebrazo y mano con dedos de dos segmentos
         this.arms = [{ shX: 228, sx: 1 }, { shX: 132, sx: -1 }].map(a => {
             const arm = { ...a };
+            arm.upperO = this._el('line', { class: 'av-sleeve-o', 'stroke-width': 34, x1: a.shX, y1: 142, x2: a.shX, y2: 200 });
             arm.upper = this._el('line', { class: 'av-sleeve', 'stroke-width': 30, x1: a.shX, y1: 142, x2: a.shX, y2: 200 });
             arm.foreO = this._el('line', { class: 'av-skin-line', 'stroke-width': 20 });
             arm.fore = this._el('line', { class: 'av-arm', 'stroke-width': 16 });
-            arm.fingersO = [0, 1, 2, 3, 4].map(() => this._el('polyline', { class: 'av-skin-line', 'stroke-width': 11, fill: 'none', 'stroke-linejoin': 'round' }));
+            arm.fingersO = [0, 1, 2, 3, 4].map(() => this._el('path', { class: 'av-finger-o' }));
+            arm.nails = [0, 1, 2, 3, 4].map(() => this._el('circle', { class: 'av-nail' }));
+            arm.fingers = [0, 1, 2, 3, 4].map(() => this._el('path', { class: 'av-finger' }));
             arm.palmO = this._el('ellipse', { class: 'av-skin av-palm-o', rx: 15, ry: 16 });
-            arm.fingers = [0, 1, 2, 3, 4].map(() => this._el('polyline', { class: 'av-finger', 'stroke-width': 8.5, fill: 'none', 'stroke-linejoin': 'round' }));
             arm.palm = this._el('ellipse', { class: 'av-skin', rx: 13, ry: 14 });
             return arm;
         });
         this.letter = this._el('text', { class: 'av-letter', x: 78, y: 70, 'text-anchor': 'middle' });
     }
 
+    setOutfit(name) {
+        const key = OUTFITS[name] ? name : 'reception';
+        this.outfitName = key;
+        if (!this.outfit) return;
+        this.outfit.innerHTML = '';
+        ['reception', 'consulting', 'pharmacy'].forEach(k => this.svg.classList.toggle('outfit-' + k, k === key));
+        OUTFITS[key]((tag, attrs) => this._el(tag, attrs, this.outfit));
+        this._render(this.current);
+    }
+
     /* ---- Dibuja una pose (16 números) ---- */
     _render(p) {
         const FINGER_OFF = [52, 20, 2, -16, -34];        // abanico de dedos (grados)
         const FINGER_LEN = [24, 32, 36, 32, 24];         // largo total de cada dedo
+        const FINGER_W = [7.5, 8, 8.5, 8.5, 8];          // grosor de la base de cada dedo
         const pt = (x, y, ang, len, sx) => [x + sx * len * Math.sin(ang), y + len * Math.cos(ang)];
         this.arms.forEach((arm, k) => {
             const u = p[k * 3], f = p[k * 3 + 1], r = p[k * 3 + 2];
@@ -792,6 +1004,7 @@ class SignAvatar {
             const ex = arm.shX + sx * 62 * Math.sin(rad(u)), ey = 142 + 62 * Math.cos(rad(u));
             const wx = ex + sx * 58 * Math.sin(rad(f)),      wy = ey + 58 * Math.cos(rad(f));
             arm.upper.setAttribute('x2', ex); arm.upper.setAttribute('y2', ey);
+            arm.upperO.setAttribute('x2', ex); arm.upperO.setAttribute('y2', ey);
             [arm.fore, arm.foreO].forEach(l => { l.setAttribute('x1', ex); l.setAttribute('y1', ey); l.setAttribute('x2', wx); l.setAttribute('y2', wy); });
             // palma: elipse orientada según la mano
             const pcx = wx + sx * 10 * Math.sin(rad(r)), pcy = wy + 10 * Math.cos(rad(r));
@@ -799,19 +1012,27 @@ class SignAvatar {
                 e.setAttribute('cx', pcx); e.setAttribute('cy', pcy);
                 e.setAttribute('transform', `rotate(${-sx * r} ${pcx} ${pcy})`);
             });
-            // dedos: dos segmentos; al doblarse se acortan y se curvan hacia el centro
+            // dedos: dos segmentos que se afinan hacia la punta, con uña en los extendidos
             for (let i = 0; i < 5; i++) {
                 const a = rad(r + FINGER_OFF[i]);
                 const c = curls[i];
                 const bx = pcx + sx * 7 * Math.sin(a), by = pcy + 7 * Math.cos(a);
-                const l1 = FINGER_LEN[i] * 0.55 * (1 - 0.3 * c);
-                const l2 = FINGER_LEN[i] * 0.45 * (1 - 0.75 * c);
-                const bend = rad(-Math.sign(FINGER_OFF[i]) * c * 30);
+                const l1 = FINGER_LEN[i] * 0.55 * (1 - 0.32 * c);
+                const l2 = FINGER_LEN[i] * 0.45 * (1 - 0.8 * c);
+                const bend = rad(-Math.sign(FINGER_OFF[i]) * c * 34);
                 const [kx, ky] = pt(bx, by, a, l1, sx);
                 const [tx, ty] = pt(kx, ky, a + bend, l2, sx);
-                const pts = `${bx},${by} ${kx},${ky} ${tx},${ty}`;
-                arm.fingers[i].setAttribute('points', pts);
-                arm.fingersO[i].setAttribute('points', pts);
+                const pts = [{ x: bx, y: by }, { x: kx, y: ky }, { x: tx, y: ty }];
+                const w0 = FINGER_W[i];
+                const outline = fingerOutline(pts, [w0, w0 * 0.78, w0 * 0.44]);
+                arm.fingers[i].setAttribute('d', outline);
+                arm.fingersO[i].setAttribute('d', fingerOutline(pts, [w0 + 1.7, w0 * 0.78 + 1.7, w0 * 0.44 + 1.7]));
+                const sxv = tx - kx, syv = ty - ky;
+                const sl = Math.hypot(sxv, syv);
+                const showNail = c < 0.35 && sl > 2;
+                arm.nails[i].setAttribute('cx', tx + (sl ? sxv / sl * 1.8 : 0));
+                arm.nails[i].setAttribute('cy', ty + (sl ? syv / sl * 1.8 : 0));
+                arm.nails[i].setAttribute('r', showNail ? 1.7 : 0);
             }
         });
     }
@@ -880,27 +1101,16 @@ function showMessage(msg, isError = false) {
 function setScenario(scenario, broadcast = true) {
     if (!SCENARIO_NAMES[scenario]) return;
     S.scenario = scenario;
+    S.autoReplyIdx = 0;
     document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scenario === scenario)));
     if (hasPatient()) renderPatientPhrases();
+    if (S.avatar) S.avatar.setOutfit(scenario);
     if (broadcast) Transport.send('SCENARIO', { scenario });
-    S.pending = null;
-    $('confirm-panel').classList.add('hidden');
     stabilizer.reset();
 }
 
 function renderPatientPhrases() {
-    // Modo demostración: simula que la cámara reconoció la seña (pide confirmación)
-    const demo = $('demo-signs'); demo.innerHTML = '';
-    signsFor(S.scenario).forEach(sign => {
-        const b = document.createElement('button');
-        b.className = 'demo-sign';
-        const strong = document.createElement('strong'); strong.textContent = sign.etiqueta_texto;
-        const sm = document.createElement('span'); sm.textContent = sign.descripcion_de_la_forma_de_mano;
-        b.append(strong, sm);
-        b.addEventListener('click', () => proposeSign(sign.etiqueta_texto, 0.8 + Math.random() * 0.15));
-        demo.appendChild(b);
-    });
-    // Frases rápidas: respaldo directo (sin confirmación, el paciente elige el texto)
+    // Frases rápidas: el paciente toca una frase y se envía directo
     const quick = $('patient-quick-phrases'); quick.innerHTML = '';
     VOCABULARY[S.scenario].forEach(p => {
         const b = document.createElement('button');
@@ -921,6 +1131,7 @@ function initPatient() {
         onState: (st) => { $('btn-avatar-play').innerHTML = st === 'playing' ? ico('pause') + ' Pausar' : ico('play') + ' Reproducir'; if (st === 'idle') $('avatar-gloss').textContent = 'Seña: —'; }
     });
     $('btn-avatar-play').innerHTML = ico('play') + ' Reproducir';
+    S.avatar.setOutfit(S.scenario);
     initDock();
     setAvatarSpeed(S.settings.avatarSpeed);     // evita que el navegador recuerde un valor viejo del selector
     startCamera();
@@ -938,6 +1149,7 @@ function receiveStaffMessage({ text, anim }) {
 function dockSend(text) {
     text = (text || '').trim();
     if (!text) return;
+    clearTimeout(S.autoReplyTimer);   // el personal respondió de verdad
     const known = findPhraseByText(text);
     receiveStaffMessage({ text, anim: known ? known.animacion_id : null });   // el avatar traduce a señas
 }
@@ -1007,6 +1219,7 @@ function initStaff() {
 function sendToPatient(text, anim) {
     text = (text || '').trim();
     if (!text) return;
+    clearTimeout(S.autoReplyTimer);   // ya respondió el personal; no hace falta la respuesta simulada
     if (!anim) { const known = findPhraseByText(text); if (known) anim = known.animacion_id; }
     appendChat('staff', text);
     Transport.send('STAFF_MSG', { text, anim: anim || null });
@@ -1014,7 +1227,7 @@ function sendToPatient(text, anim) {
 
 function receivePatientMessage({ text }) {
     appendChat('patient', text);
-    if (S.settings.tts) speak(text);
+    if (S.settings.tts) speakDelayed(text);   // misma pausa: no sonar al instante
 }
 
 function appendChat(from, text) {
@@ -1035,7 +1248,7 @@ function appendChat(from, text) {
 function startSession() {
     S.role = document.querySelector('input[name="role"]:checked').value;
     const scenario = document.querySelector('input[name="scenario"]:checked').value;
-    S.active = true; S.conversation = []; S.pending = null; S.cooldownUntil = 0;
+    S.active = true; S.conversation = []; S.cooldownUntil = 0;
     S.peerSeen = 0; S.peerSynced = false; S.retriedLang = false;
 
     const supported = Transport.open(onTransportMessage, S.role === 'both');
@@ -1064,9 +1277,9 @@ function clearHistory(broadcast = true) {
     $('sent-status').classList.add('hidden');
     $('staff-response-text').textContent = '(Esperando respuesta…)';
     $('mic-live').textContent = '';
-    S.lastStaff = null; S.pending = null;
-    $('confirm-panel').classList.add('hidden');
-    if (S.avatar) S.avatar.stop();
+S.lastStaff = null; S.lastPatientText = null;
+    clearTimeout(S.autoReplyTimer);
+    clearTimeout(S.voiceTimer);
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     if (broadcast) Transport.send('CLEAR');
 }
@@ -1141,8 +1354,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setScenario(b.dataset.scenario, true)));
 
     // Paciente
-    $('btn-confirm-yes').addEventListener('click', () => resolveConfirmation(true));
-    $('btn-confirm-no').addEventListener('click', () => resolveConfirmation(false));
     $('btn-avatar-play').addEventListener('click', () => {
         if (!S.avatar) return;
         if (S.avatar.state === 'playing') S.avatar.pause(); else if (S.avatar.state === 'paused') S.avatar.play(); else S.avatar.replay();
@@ -1154,11 +1365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         receiveStaffMessage({ text: p.texto, anim: p.animacion_id });
     });
 
-    // Pestañas: frases rápidas / simular señas
-    const tabs = { 'tab-phrases': 'panel-phrases', 'tab-demo': 'panel-demo' };
-    Object.entries(tabs).forEach(([tab, panel]) => $(tab).addEventListener('click', () => {
-        Object.entries(tabs).forEach(([t, p]) => { $(t).setAttribute('aria-selected', String(t === tab)); $(p).classList.toggle('hidden', t !== tab); });
-    }));
+    // Pestañas: frases rápidas / simular señas (se eliminó el modo simular)
 
     // Caja "Responde aquí" y lectura en voz alta del paciente
     $('btn-dock-mic').addEventListener('click', toggleDockMic);

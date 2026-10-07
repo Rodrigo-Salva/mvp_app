@@ -125,31 +125,19 @@
 
             <div class="pl-wrap">
               <div class="patient-layout">
-                <!-- Cámara (grande) con la confirmación encima -->
+                <!-- Cámara (grande) -->
                 <section class="card area-cam" aria-labelledby="p-cam">
                     <h3 id="p-cam"><span class="step-num">1</span> Haz una seña a la cámara</h3>
                     <div class="video-container">
                         <video id="input-video" class="input-video" playsinline muted></video>
-                        <canvas id="output-canvas" class="output-canvas" width="640" height="480" aria-label="Vista previa de la cámara con los puntos de la mano"></canvas>
+                        <canvas id="output-canvas" class="output-canvas" width="960" height="600" aria-label="Vista previa de la cámara con los puntos de la mano"></canvas>
                         <div id="camera-status" class="status-overlay" role="status">Cámara sin iniciar</div>
-
-                        <div id="confirm-panel" class="confirm-panel hidden" role="alertdialog" aria-labelledby="confirm-text">
-                            <p id="confirm-text" class="confirm-text"></p>
-                            <div class="meter-row">
-                                <progress id="confirm-confidence" max="100" value="0" aria-label="Confianza"></progress>
-                                <span>Confianza: <strong id="confirm-confidence-label"></strong></span>
-                            </div>
-                            <div class="btn-group">
-                                <button id="btn-confirm-yes" class="btn btn-primary btn-xl"><svg class="i"><use href="#i-check"/></svg> Sí, enviar</button>
-                                <button id="btn-confirm-no" class="btn btn-ghost btn-xl"><svg class="i"><use href="#i-x"/></svg> No</button>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="live-box">
                         <div class="meter-row">
                             <progress id="live-progress" max="100" value="0" aria-label="Avance del reconocimiento"></progress>
-                            <span id="live-label" class="live-label">Sin mano a la vista</span>
+                            <span id="live-label" class="live-label">Sin manos a la vista</span>
                         </div>
                         <div id="live-fingers" class="fingers" aria-label="Estado de los dedos detectados"></div>
                     </div>
@@ -191,22 +179,12 @@
                     <p class="disclaimer-text">Animación <strong>ilustrativa</strong>, no validada con la comunidad sorda ni con intérpretes de LSP. Lee siempre el subtítulo.</p>
                 </section>
 
-                <!-- Frases rápidas y modo demostración -->
+                <!-- Frases rápidas -->
                 <section class="card area-phrases" aria-labelledby="p-phr">
                     <div class="phr-head">
                         <h3 id="p-phr">Responde con una frase</h3>
-                        <div class="seg seg-small" role="tablist" aria-label="Tipo de ayuda">
-                            <button type="button" role="tab" id="tab-phrases" aria-selected="true" aria-controls="panel-phrases">Frases rápidas</button>
-                            <button type="button" role="tab" id="tab-demo" aria-selected="false" aria-controls="panel-demo">Simular una seña</button>
-                        </div>
                     </div>
-                    <div id="panel-phrases" role="tabpanel" aria-labelledby="tab-phrases">
-                        <div id="patient-quick-phrases" class="phrase-grid"></div>
-                    </div>
-                    <div id="panel-demo" role="tabpanel" aria-labelledby="tab-demo" class="hidden">
-                        <p class="note">Modo demostración: toca una seña para simular que la cámara la reconoció. Se pedirá confirmación antes de enviar.</p>
-                        <div id="demo-signs" class="demo-signs"></div>
-                    </div>
+                    <div id="patient-quick-phrases" class="phrase-grid"></div>
                 </section>
 
                 <!-- Caja del personal (solo cuando se usa una sola pantalla) -->
