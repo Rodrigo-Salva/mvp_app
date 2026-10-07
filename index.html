@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SeñasYa: prototipo para comunicar a una persona sorda o muda con el personal de salud, en persona.">
     <title>SeñasYa - Prototipo</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='26' fill='%230f6b7a'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='white' stroke-width='9'/%3E%3C/svg%3E">
+
+    <!-- Tipografía: Outfit (títulos) y Atkinson Hyperlegible (texto, pensada para máxima legibilidad). Sin internet se usa la fuente del sistema. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 
     <!-- MediaPipe Hands (legacy solution) por CDN. El video se procesa SOLO en este dispositivo. -->
@@ -11,208 +18,271 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 </head>
 <body data-theme="default">
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+
+    <!-- Íconos (un solo estilo de trazo para toda la app) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+        <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+        <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h3M11 7h9M4 17h9M17 17h3"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+        <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+        <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+        <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+        <symbol id="i-cross" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="5"/><path d="M12 8v8M8 12h8"/></symbol>
+        <symbol id="i-pill" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></symbol>
+        <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></symbol>
+        <symbol id="i-hand" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
+    </defs></svg>
 
     <!-- ============ Aviso de consentimiento ============ -->
     <div id="consent-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="consent-title">
         <div class="modal-content">
-            <h2 id="consent-title">Bienvenido a SeñasYa</h2>
-            <p>Esta aplicación ayuda a comunicarse en persona entre una persona sorda o muda y el personal de salud.</p>
-            <ul class="plain-list">
-                <li>📷 <strong>Cámara</strong> (tablet del paciente): para ver los gestos de la mano.</li>
-                <li>🎤 <strong>Micrófono</strong> (tablet del personal): para convertir la voz en texto.</li>
-                <li>🔒 <strong>No se guarda nada.</strong> El video se procesa en el dispositivo y no se sube a ningún servidor. Las conversaciones solo viven en la memoria y se borran al terminar.</li>
+            <p class="eyebrow">Antes de empezar</p>
+            <h2 id="consent-title">Tu privacidad primero</h2>
+            <ul class="consent-list">
+                <li><span class="ico"><svg class="i"><use href="#i-camera"/></svg></span><span><strong>Cámara</strong> en la tablet del paciente, para ver los gestos de la mano.</span></li>
+                <li><span class="ico"><svg class="i"><use href="#i-mic"/></svg></span><span><strong>Micrófono</strong> en la tablet del personal, para pasar la voz a texto.</span></li>
+                <li><span class="ico"><svg class="i"><use href="#i-check"/></svg></span><span><strong>No se guarda nada.</strong> El video se procesa en el equipo y no se sube. La conversación solo vive en la memoria y se borra al terminar.</span></li>
             </ul>
-            <p class="note">Prototipo de demostración: el reconocimiento de señas es limitado (ver aviso en pantalla).</p>
-            <button id="btn-accept-consent" class="btn btn-primary btn-large">✔ Aceptar y continuar</button>
+            <p class="note">Es un prototipo de demostración: el reconocimiento de señas es limitado.</p>
+            <button id="btn-accept-consent" class="btn btn-primary btn-large btn-block">Aceptar y continuar</button>
         </div>
     </div>
 
     <!-- ============ Pantalla de inicio ============ -->
-    <main id="home-screen" class="screen home hidden">
+    <main id="home-screen" class="home hidden">
+        <div id="main-content" tabindex="-1"></div>
         <header class="home-header">
-            <div class="logo" aria-hidden="true">🤟</div>
-            <h1>SeñasYa</h1>
-            <p>Comunicación sin barreras en la atención de salud</p>
+            <div class="logo" aria-hidden="true"><svg class="i"><use href="#i-hand"/></svg></div>
+            <div>
+                <h1>SeñasYa</h1>
+                <p class="tagline">Hablar y entenderse en el centro de salud, sin intérprete.</p>
+            </div>
         </header>
 
-        <section class="setup-grid" aria-label="Configuración inicial">
-            <fieldset class="card">
-                <legend>1. ¿Quién usará esta pantalla?</legend>
-                <div class="radio-group">
-                    <label class="radio-btn"><input type="radio" name="role" value="patient" checked><span>🧏 Paciente <small>(cámara y señas)</small></span></label>
-                    <label class="radio-btn"><input type="radio" name="role" value="staff"><span>🩺 Personal de salud <small>(voz y texto)</small></span></label>
-                    <label class="radio-btn"><input type="radio" name="role" value="both"><span>🖥️ Demo en una sola pantalla <small>(ambas vistas)</small></span></label>
-                </div>
-            </fieldset>
+        <section class="step" aria-labelledby="step1">
+            <h2 id="step1"><span class="step-num">1</span> ¿Quién usa esta pantalla?</h2>
+            <div class="tiles">
+                <label class="tile"><input type="radio" name="role" value="patient" checked>
+                    <span class="tile-body"><span class="tile-ico"><svg class="i"><use href="#i-hand"/></svg></span><strong>Paciente</strong><small>Usa cámara y señas</small></span></label>
+                <label class="tile"><input type="radio" name="role" value="staff">
+                    <span class="tile-body"><span class="tile-ico"><svg class="i"><use href="#i-mic"/></svg></span><strong>Personal de salud</strong><small>Usa voz y texto</small></span></label>
+                <label class="tile"><input type="radio" name="role" value="both">
+                    <span class="tile-body"><span class="tile-ico"><svg class="i"><use href="#i-monitor"/></svg></span><strong>Demo en una pantalla</strong><small>Ambas vistas juntas, sin cámara</small></span></label>
+            </div>
+        </section>
 
-            <fieldset class="card">
-                <legend>2. ¿En qué área se encuentra?</legend>
-                <div class="radio-group">
-                    <label class="radio-btn"><input type="radio" name="scenario" value="reception" checked><span>🗓️ Recepción <small>(citas)</small></span></label>
-                    <label class="radio-btn"><input type="radio" name="scenario" value="consulting"><span>🩺 Consultorio</span></label>
-                    <label class="radio-btn"><input type="radio" name="scenario" value="pharmacy"><span>💊 Farmacia</span></label>
-                </div>
-            </fieldset>
+        <section class="step" aria-labelledby="step2">
+            <h2 id="step2"><span class="step-num">2</span> ¿Dónde se atiende?</h2>
+            <div class="tiles">
+                <label class="tile"><input type="radio" name="scenario" value="reception" checked>
+                    <span class="tile-body"><span class="tile-ico"><svg class="i"><use href="#i-calendar"/></svg></span><strong>Recepción</strong><small>Agendar o consultar una cita</small></span></label>
+                <label class="tile"><input type="radio" name="scenario" value="consulting">
+                    <span class="tile-body"><span class="tile-ico"><svg class="i"><use href="#i-cross"/></svg></span><strong>Consultorio</strong><small>Hablar con el doctor</small></span></label>
+                <label class="tile"><input type="radio" name="scenario" value="pharmacy">
+                    <span class="tile-body"><span class="tile-ico"><svg class="i"><use href="#i-pill"/></svg></span><strong>Farmacia</strong><small>Recoger medicinas</small></span></label>
+            </div>
         </section>
 
         <div class="home-actions">
-            <button id="btn-start" class="btn btn-primary btn-large">▶ Iniciar conversación</button>
-            <button id="btn-settings-home" class="btn btn-secondary btn-large">⚙ Ajustes</button>
+            <button id="btn-start" class="btn btn-primary btn-xl">Iniciar conversación <svg class="i"><use href="#i-send"/></svg></button>
+            <button id="btn-settings-home" class="btn btn-ghost"><svg class="i"><use href="#i-sliders"/></svg> Ajustes</button>
         </div>
-        <p class="note center">Para probar con dos tablets: abre esta página en dos pestañas, una como Paciente y otra como Personal de salud.</p>
+        <p class="note">Para probar con dos tablets, abre esta página en dos pestañas: una como Paciente y otra como Personal.</p>
     </main>
 
-    <!-- ============ Contenedor de las vistas de la conversación ============ -->
+    <!-- ============ Vistas de la conversación ============ -->
     <div id="app-root" class="app-root hidden">
 
         <!-- ---------- Vista Paciente (Tablet A) ---------- -->
         <section id="patient-screen" class="screen hidden" aria-label="Vista del paciente">
             <header class="app-header">
-                <h2>🧏 Paciente</h2>
+                <div class="who-am-i">
+                    <span class="who-ico"><svg class="i"><use href="#i-hand"/></svg></span>
+                    <h2>Paciente</h2>
+                    <span id="link-status-patient" class="pill" role="status">Esperando al personal…</span>
+                </div>
+                <div class="seg" id="scenario-patient" role="group" aria-label="Área de atención">
+                    <button type="button" data-scenario="reception" aria-pressed="true"><svg class="i"><use href="#i-calendar"/></svg> Recepción</button>
+                    <button type="button" data-scenario="consulting" aria-pressed="false"><svg class="i"><use href="#i-cross"/></svg> Consultorio</button>
+                    <button type="button" data-scenario="pharmacy" aria-pressed="false"><svg class="i"><use href="#i-pill"/></svg> Farmacia</button>
+                </div>
                 <div class="header-actions">
-                    <span id="link-status-patient" class="pill" role="status">⏳ Esperando al personal…</span>
-                    <label class="inline-select">Área:
-                        <select id="scenario-patient" aria-label="Área de atención">
-                            <option value="reception">🗓️ Recepción</option>
-                            <option value="consulting">🩺 Consultorio</option>
-                            <option value="pharmacy">💊 Farmacia</option>
-                        </select>
-                    </label>
-                    <button id="btn-settings-patient" class="btn btn-secondary">⚙ Ajustes</button>
-                    <button class="btn btn-danger btn-end">🗑 Terminar y borrar conversación</button>
+                    <button id="btn-settings-patient" class="btn btn-ghost" aria-label="Ajustes"><svg class="i"><use href="#i-sliders"/></svg><span class="lbl"> Ajustes</span></button>
+                    <button class="btn btn-danger-soft btn-end"><svg class="i"><use href="#i-trash"/></svg> Terminar y borrar</button>
                 </div>
             </header>
 
-            <div class="patient-layout">
-                <!-- Columna izquierda: cámara, reconocimiento y respaldo -->
-                <div class="col">
+            <div class="pl-wrap">
+              <div class="patient-layout">
+                <!-- Cámara (grande) con la confirmación encima -->
+                <section class="card area-cam" aria-labelledby="p-cam">
+                    <h3 id="p-cam"><span class="step-num">1</span> Haz una seña a la cámara</h3>
                     <div class="video-container">
                         <video id="input-video" class="input-video" playsinline muted></video>
                         <canvas id="output-canvas" class="output-canvas" width="640" height="480" aria-label="Vista previa de la cámara con los puntos de la mano"></canvas>
-                        <div id="camera-status" class="status-overlay" role="status">📷 Cámara sin iniciar</div>
-                    </div>
-
-                    <div class="live-box">
-                        <div id="live-fingers" class="fingers" aria-label="Estado de los dedos detectados"></div>
-                        <div class="meter-row">
-                            <label for="live-progress">Reconociendo seña:</label>
-                            <progress id="live-progress" max="100" value="0"></progress>
-                            <span id="live-label" class="live-label">Sin mano a la vista</span>
-                        </div>
-                    </div>
-
-                    <div class="recognized-text-box">
-                        <h3>Lo que dices:</h3>
-                        <p id="patient-current-text" class="large-text" aria-live="polite">Haz una seña frente a la cámara o usa una frase.</p>
-                        <p id="sent-status" class="sent-status hidden" role="status"></p>
+                        <div id="camera-status" class="status-overlay" role="status">Cámara sin iniciar</div>
 
                         <div id="confirm-panel" class="confirm-panel hidden" role="alertdialog" aria-labelledby="confirm-text">
                             <p id="confirm-text" class="confirm-text"></p>
                             <div class="meter-row">
-                                <label for="confirm-confidence">Confianza:</label>
-                                <progress id="confirm-confidence" max="100" value="0"></progress>
-                                <span id="confirm-confidence-label"></span>
+                                <progress id="confirm-confidence" max="100" value="0" aria-label="Confianza"></progress>
+                                <span>Confianza: <strong id="confirm-confidence-label"></strong></span>
                             </div>
                             <div class="btn-group">
-                                <button id="btn-confirm-yes" class="btn btn-primary btn-large">✔ Sí, enviar</button>
-                                <button id="btn-confirm-no" class="btn btn-secondary btn-large">✖ No</button>
+                                <button id="btn-confirm-yes" class="btn btn-primary btn-xl"><svg class="i"><use href="#i-check"/></svg> Sí, enviar</button>
+                                <button id="btn-confirm-no" class="btn btn-ghost btn-xl"><svg class="i"><use href="#i-x"/></svg> No</button>
                             </div>
                         </div>
                     </div>
 
-                    <p class="limit-note">⚠ <strong>Límite del prototipo:</strong> el reconocimiento usa reglas simples (qué dedos están extendidos) para un conjunto pequeño de señas de demostración. No es Lengua de Señas Peruana completa.</p>
-                </div>
-
-                <!-- Columna derecha: respuesta del personal y demo -->
-                <div class="col">
-                    <div class="response-box">
-                        <h3>El personal dice:</h3>
-                        <div id="staff-response-text" class="staff-subtitle" aria-live="polite">(Esperando respuesta…)</div>
-
-                        <div class="avatar-panel">
-                            <div id="sign-avatar-container" class="avatar-container"></div>
-                            <p id="avatar-gloss" class="avatar-gloss" aria-hidden="true">Seña: —</p>
-                            <div class="avatar-controls">
-                                <button id="btn-avatar-play" class="btn btn-secondary">⏸ Pausar</button>
-                                <button id="btn-avatar-replay" class="btn btn-secondary">↻ Repetir</button>
-                                <button id="btn-avatar-test" class="btn btn-secondary">🎭 Probar con respuesta de ejemplo</button>
-                                <label class="inline-select">Velocidad:
-                                    <select id="avatar-speed" aria-label="Velocidad del avatar">
-                                        <option value="0.5">0.5x</option>
-                                        <option value="1" selected>1x</option>
-                                        <option value="1.5">1.5x</option>
-                                    </select>
-                                </label>
-                            </div>
-                            <!-- Las poses son ilustrativas. Deben validarse con la comunidad sorda y un intérprete certificado de LSP. -->
-                            <p class="disclaimer-text">Animación esquemática <strong>ilustrativa</strong>, no validada con la comunidad sorda ni con intérpretes de LSP. Lee siempre el subtítulo.</p>
+                    <div class="live-box">
+                        <div class="meter-row">
+                            <progress id="live-progress" max="100" value="0" aria-label="Avance del reconocimiento"></progress>
+                            <span id="live-label" class="live-label">Sin mano a la vista</span>
                         </div>
+                        <div id="live-fingers" class="fingers" aria-label="Estado de los dedos detectados"></div>
                     </div>
 
-                    <details class="demo-panel" open>
-                        <summary>🎭 Modo demostración (sin cámara)</summary>
-                        <p class="note">Toca una seña para simular que la cámara la reconoció. Se pedirá confirmación antes de enviar.</p>
+                    <div class="say-box">
+                        <p class="say-label">Lo que dices</p>
+                        <p id="patient-current-text" class="say-text" aria-live="polite">Haz una seña o toca una frase.</p>
+                        <p id="sent-status" class="sent-status hidden" role="status"></p>
+                        <label class="switch-row">
+                            <input type="checkbox" id="tts-patient" checked>
+                            <span class="switch-box" aria-hidden="true"></span>
+                            <span><svg class="i"><use href="#i-volume"/></svg> Decir en voz alta lo que señalo</span>
+                        </label>
+                        <p class="limit-note"><svg class="i"><use href="#i-alert"/></svg> Prototipo: reconoce formas de mano simples, no Lengua de Señas Peruana completa.</p>
+                    </div>
+                </section>
+
+                <!-- Respuesta del personal: avatar grande -->
+                <section class="card area-resp" aria-labelledby="p-resp">
+                    <h3 id="p-resp"><span class="step-num">2</span> El personal responde</h3>
+                    <div id="staff-response-text" class="staff-subtitle" aria-live="polite">(Esperando respuesta…)</div>
+                    <div class="avatar-panel">
+                        <div id="sign-avatar-container" class="avatar-container"></div>
+                        <p id="avatar-gloss" class="avatar-gloss" aria-hidden="true">Seña: —</p>
+                    </div>
+                    <div class="avatar-controls">
+                        <button id="btn-avatar-play" class="btn btn-ghost"><svg class="i"><use href="#i-play"/></svg> Reproducir</button>
+                        <button id="btn-avatar-replay" class="btn btn-ghost"><svg class="i"><use href="#i-repeat"/></svg> Repetir</button>
+                        <label class="inline-select">Velocidad
+                            <select id="avatar-speed" aria-label="Velocidad del avatar">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                            </select>
+                        </label>
+                        <button id="btn-avatar-test" class="btn btn-text"><svg class="i"><use href="#i-eye"/></svg> Ver ejemplo</button>
+                    </div>
+                    <!-- Las poses son ilustrativas. Deben validarse con la comunidad sorda y un intérprete certificado de LSP. -->
+                    <p class="disclaimer-text">Animación <strong>ilustrativa</strong>, no validada con la comunidad sorda ni con intérpretes de LSP. Lee siempre el subtítulo.</p>
+                </section>
+
+                <!-- Frases rápidas y modo demostración -->
+                <section class="card area-phrases" aria-labelledby="p-phr">
+                    <div class="phr-head">
+                        <h3 id="p-phr">Responde con una frase</h3>
+                        <div class="seg seg-small" role="tablist" aria-label="Tipo de ayuda">
+                            <button type="button" role="tab" id="tab-phrases" aria-selected="true" aria-controls="panel-phrases">Frases rápidas</button>
+                            <button type="button" role="tab" id="tab-demo" aria-selected="false" aria-controls="panel-demo">Simular una seña</button>
+                        </div>
+                    </div>
+                    <div id="panel-phrases" role="tabpanel" aria-labelledby="tab-phrases">
+                        <div id="patient-quick-phrases" class="phrase-grid"></div>
+                    </div>
+                    <div id="panel-demo" role="tabpanel" aria-labelledby="tab-demo" class="hidden">
+                        <p class="note">Modo demostración: toca una seña para simular que la cámara la reconoció. Se pedirá confirmación antes de enviar.</p>
                         <div id="demo-signs" class="demo-signs"></div>
-                    </details>
-
-                    <div class="quick-box">
-                        <h3>Frases rápidas (respaldo)</h3>
-                        <div id="patient-quick-phrases" class="chips-container"></div>
                     </div>
-                </div>
+                </section>
+
+                <!-- Caja del personal (solo cuando se usa una sola pantalla) -->
+                <section id="staff-dock" class="card area-dock dock" aria-labelledby="dock-title">
+                    <h3 id="dock-title">Personal de salud: responde aquí</h3>
+                    <p class="note">El avatar traducirá tu mensaje a señas.</p>
+                    <div class="text-row">
+                        <button id="btn-dock-mic" class="btn btn-ghost" aria-pressed="false"><svg class="i"><use href="#i-mic"/></svg> Hablar</button>
+                        <input type="text" id="dock-input" autocomplete="off" aria-label="Respuesta escrita del personal" placeholder="Escribe y presiona Enter…">
+                        <button id="btn-dock-send" class="btn btn-primary">Enviar <svg class="i"><use href="#i-send"/></svg></button>
+                    </div>
+                    <p id="dock-live" class="mic-live" aria-live="polite"></p>
+                    <div id="dock-phrases" class="chips-container"></div>
+                </section>
+              </div>
             </div>
         </section>
 
         <!-- ---------- Vista Personal de salud (Tablet B) ---------- -->
         <section id="staff-screen" class="screen hidden" aria-label="Vista del personal de salud">
             <header class="app-header">
-                <h2>🩺 Personal de salud</h2>
+                <div class="who-am-i">
+                    <span class="who-ico"><svg class="i"><use href="#i-cross"/></svg></span>
+                    <h2>Personal de salud</h2>
+                    <span id="link-status-staff" class="pill" role="status">Esperando al paciente…</span>
+                </div>
+                <div class="seg" id="scenario-staff" role="group" aria-label="Área de atención">
+                    <button type="button" data-scenario="reception" aria-pressed="true"><svg class="i"><use href="#i-calendar"/></svg> Recepción</button>
+                    <button type="button" data-scenario="consulting" aria-pressed="false"><svg class="i"><use href="#i-cross"/></svg> Consultorio</button>
+                    <button type="button" data-scenario="pharmacy" aria-pressed="false"><svg class="i"><use href="#i-pill"/></svg> Farmacia</button>
+                </div>
                 <div class="header-actions">
-                    <span id="link-status-staff" class="pill" role="status">⏳ Esperando al paciente…</span>
-                    <label class="inline-select">Área:
-                        <select id="scenario-staff" aria-label="Área de atención">
-                            <option value="reception">🗓️ Recepción</option>
-                            <option value="consulting">🩺 Consultorio</option>
-                            <option value="pharmacy">💊 Farmacia</option>
-                        </select>
-                    </label>
-                    <button id="btn-settings-staff" class="btn btn-secondary">⚙ Ajustes</button>
-                    <button class="btn btn-danger btn-end">🗑 Terminar y borrar conversación</button>
+                    <button id="btn-settings-staff" class="btn btn-ghost" aria-label="Ajustes"><svg class="i"><use href="#i-sliders"/></svg><span class="lbl"> Ajustes</span></button>
+                    <button class="btn btn-danger-soft btn-end"><svg class="i"><use href="#i-trash"/></svg> Terminar y borrar</button>
                 </div>
             </header>
 
-            <div class="staff-layout">
-                <section class="chat-wrap" aria-label="Conversación">
+            <div class="staff-wrap">
+              <div class="staff-layout">
+                <section class="card chat-wrap" aria-label="Conversación">
+                    <h3>Conversación</h3>
                     <div id="chat-container" class="chat-history" aria-live="polite">
                         <div class="chat-placeholder">La conversación aparecerá aquí…</div>
                     </div>
                     <label class="switch-row">
                         <input type="checkbox" id="tts-toggle" checked>
                         <span class="switch-box" aria-hidden="true"></span>
-                        <span>🔊 Leer en voz alta lo que dice el paciente</span>
+                        <span><svg class="i"><use href="#i-volume"/></svg> Leer en voz alta lo que dice el paciente</span>
                     </label>
                 </section>
 
                 <section class="response-controls" aria-label="Responder al paciente">
-                    <div class="mic-container">
-                        <button id="btn-mic" class="btn-mic" aria-pressed="false" aria-label="Responder por voz">🎤</button>
-                        <p id="mic-status" class="mic-status" role="status">Toca para hablar</p>
-                        <p id="mic-live" class="mic-live" aria-live="polite"></p>
-                    </div>
-
-                    <div class="text-fallback">
-                        <label for="staff-text-input">O escribe tu respuesta:</label>
-                        <div class="text-row">
-                            <input type="text" id="staff-text-input" autocomplete="off" placeholder="Escribe aquí…">
-                            <button id="btn-send-text" class="btn btn-primary">➤ Enviar</button>
+                    <div class="card mic-card">
+                        <div class="mic-row">
+                            <button id="btn-mic" class="btn-mic" aria-pressed="false" aria-label="Responder por voz"><svg class="i"><use href="#i-mic"/></svg></button>
+                            <div>
+                                <h3>Responder por voz</h3>
+                                <p id="mic-status" class="mic-status" role="status">Toca para hablar</p>
+                                <p id="mic-live" class="mic-live" aria-live="polite"></p>
+                            </div>
+                        </div>
+                        <div class="text-fallback">
+                            <label for="staff-text-input">O escribe tu respuesta</label>
+                            <div class="text-row">
+                                <input type="text" id="staff-text-input" autocomplete="off" placeholder="Escribe y presiona Enter…">
+                                <button id="btn-send-text" class="btn btn-primary">Enviar <svg class="i"><use href="#i-send"/></svg></button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="quick-box">
+                    <div class="card">
                         <h3>Respuestas rápidas</h3>
                         <div id="staff-phrases-container" class="chips-container"></div>
                     </div>
                 </section>
+              </div>
             </div>
         </section>
     </div>
@@ -220,7 +290,7 @@
     <!-- ============ Ajustes ============ -->
     <div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="modal-content">
-            <h2 id="settings-title">⚙ Ajustes</h2>
+            <h2 id="settings-title">Ajustes</h2>
 
             <div class="setting-group">
                 <label for="setting-fontsize">Tamaño de letra</label>
@@ -255,10 +325,10 @@
 
             <div class="setting-group">
                 <span>Conversación</span>
-                <button id="btn-clear-history" class="btn btn-danger">🗑 Borrar historial</button>
+                <button id="btn-clear-history" class="btn btn-danger-soft"><svg class="i"><use href="#i-trash"/></svg> Borrar historial</button>
             </div>
 
-            <button id="btn-close-settings" class="btn btn-primary btn-large">✔ Cerrar</button>
+            <button id="btn-close-settings" class="btn btn-primary btn-large btn-block">Listo</button>
         </div>
     </div>
 
