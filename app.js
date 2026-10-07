@@ -157,37 +157,37 @@ const CURLS = {   // 0 = dedo extendido, 1 = dedo doblado. Orden: pulgar, índic
     hook:   [0.3, 0.7, 0.7, 0.7, 0.7],
     ycurl:  [0, 1, 1, 1, 0]
 };
-const REST_ARM = [8, 4, 0, 'relax'];
+const REST_ARM = [14, 330, 0, 'relax'];
 
 // Cada gesto = lista de fotogramas [brazoA, brazoB]. Brazo A = derecha del avatar en pantalla.
 const GESTOS = {
     reposo:   [[REST_ARM, REST_ARM]],
-    saludo:   [[[60,170,180,'open'], REST_ARM], [[60,190,195,'open'], REST_ARM], [[60,170,170,'open'], REST_ARM]],
-    yo:       [[[10,250,250,'point'], REST_ARM], [[10,245,245,'point'], REST_ARM]],
-    tu:       [[[60,95,95,'point'], REST_ARM]],
-    cita:     [[[30,110,110,'flat'], [30,110,110,'flat']], [[30,125,125,'flat'], [30,110,110,'flat']]],
-    hoy:      [[[20,60,60,'flat'], [20,60,60,'flat']], [[20,75,75,'flat'], [20,75,75,'flat']]],
-    hora:     [[[30,190,200,'point'], [25,110,110,'flat']], [[30,185,195,'point'], [25,110,110,'flat']]],
-    pulso:    [[[30,190,200,'flat'], [25,110,110,'flat']], [[30,195,205,'flat'], [25,110,110,'flat']]],
-    dolor:    [[[30,235,250,'point'], [30,235,250,'point']], [[30,225,235,'point'], [30,225,235,'point']]],
-    fiebre:   [[[60,185,225,'open'], REST_ARM], [[60,180,220,'open'], REST_ARM]],
-    mareo:    [[[70,190,160,'open'], [70,190,160,'open']], [[70,190,200,'open'], [70,190,200,'open']], [[70,190,160,'open'], [70,190,160,'open']]],
-    gracias:  [[[0,205,215,'flat'], REST_ARM], [[40,160,160,'flat'], REST_ARM]],
-    si:       [[[40,170,180,'fist'], REST_ARM], [[40,150,160,'fist'], REST_ARM], [[40,170,180,'fist'], REST_ARM]],
-    no:       [[[40,170,160,'point'], REST_ARM], [[40,170,200,'point'], REST_ARM], [[40,170,160,'point'], REST_ARM]],
-    entender: [[[60,190,190,'point'], REST_ARM], [[60,195,200,'point'], REST_ARM]],
-    sordo:    [[[55,185,185,'point'], REST_ARM], [[30,215,230,'point'], REST_ARM]],
-    pregunta: [[[50,150,150,'open'], REST_ARM], [[50,140,140,'open'], REST_ARM]],
-    esperar:  [[[30,100,100,'open'], [30,100,100,'open']], [[30,105,105,'open'], [30,105,105,'open']]],
-    firmar:   [[[30,100,120,'pinch'], [30,95,95,'flat']], [[30,105,130,'pinch'], [30,95,95,'flat']]],
-    pase:     [[[60,100,95,'open'], REST_ARM], [[60,100,95,'hook'], REST_ARM], [[60,100,95,'open'], REST_ARM]],
-    medicina: [[[30,200,200,'pinch'], REST_ARM], [[30,190,190,'pinch'], REST_ARM]],
-    dinero:   [[[30,120,120,'pinch'], REST_ARM], [[30,120,125,'open'], REST_ARM]],
-    repetir:  [[[40,150,140,'open'], REST_ARM], [[40,150,170,'open'], REST_ARM], [[40,150,200,'open'], REST_ARM]],
-    cambiar:  [[[30,110,110,'fist'], [30,110,110,'fist']], [[30,95,95,'fist'], [30,125,125,'fist']]],
-    ayuda:    [[[30,120,120,'flat'], [30,120,120,'flat']], [[30,95,95,'flat'], [30,95,95,'flat']]],
-    alergia:  [[[40,200,210,'hook'], [25,110,110,'flat']], [[40,205,220,'hook'], [25,110,110,'flat']]],
-    grave:    [[[30,120,120,'fist'], [30,120,120,'fist']], [[30,110,110,'fist'], [30,130,130,'fist']]]
+    saludo:   [[[50,165,175,'open'], REST_ARM], [[50,160,150,'open'], REST_ARM], [[50,165,195,'open'], REST_ARM], [[50,160,155,'open'], REST_ARM]],
+    yo:       [[[10,250,250,'point'], REST_ARM], [[12,246,246,'point'], REST_ARM]],
+    tu:       [[[45,150,150,'point'], REST_ARM], [[48,145,145,'point'], REST_ARM]],
+    cita:     [[[25,235,235,'flat'], [25,240,240,'flat']], [[25,228,228,'flat'], [25,240,240,'flat']], [[25,235,235,'flat'], [25,240,240,'flat']]],
+    hoy:      [[[22,230,215,'flat'], [22,230,215,'flat']], [[22,238,225,'flat'], [22,238,225,'flat']]],
+    hora:     [[[25,235,235,'point'], [25,242,242,'flat']], [[25,240,240,'point'], [25,242,242,'flat']]],
+    pulso:    [[[25,235,235,'flat'], [25,242,242,'flat']], [[25,240,242,'flat'], [25,242,242,'flat']]],
+    dolor:    [[[30,245,250,'point'], [30,245,250,'point']], [[30,235,240,'point'], [30,235,240,'point']], [[30,245,250,'point'], [30,245,250,'point']]],
+    fiebre:   [[[115,225,225,'open'], REST_ARM], [[115,230,235,'open'], REST_ARM]],
+    mareo:    [[[115,215,200,'open'], [115,215,200,'open']], [[115,215,240,'open'], [115,215,240,'open']], [[115,215,200,'open'], [115,215,200,'open']]],
+    gracias:  [[[100,230,225,'flat'], REST_ARM], [[65,175,170,'flat'], REST_ARM]],
+    si:       [[[25,200,200,'fist'], REST_ARM], [[25,185,185,'fist'], REST_ARM], [[25,205,205,'fist'], REST_ARM]],
+    no:       [[[40,175,160,'point'], REST_ARM], [[40,175,200,'point'], REST_ARM], [[40,175,160,'point'], REST_ARM], [[40,175,200,'point'], REST_ARM]],
+    entender: [[[110,215,200,'point'], REST_ARM], [[110,215,215,'point'], REST_ARM]],
+    sordo:    [[[110,215,200,'point'], REST_ARM], [[90,235,235,'point'], REST_ARM]],
+    pregunta: [[[50,165,165,'open'], REST_ARM], [[50,158,150,'open'], REST_ARM]],
+    esperar:  [[[20,235,235,'open'], [20,235,235,'open']], [[20,226,226,'open'], [20,226,226,'open']]],
+    firmar:   [[[25,235,225,'pinch'], [25,245,245,'flat']], [[25,240,232,'pinch'], [25,245,245,'flat']], [[25,235,225,'pinch'], [25,245,245,'flat']]],
+    pase:     [[[40,160,160,'open'], REST_ARM], [[40,160,160,'hook'], REST_ARM], [[40,160,160,'open'], REST_ARM]],
+    medicina: [[[100,230,225,'pinch'], REST_ARM], [[100,225,220,'pinch'], REST_ARM]],
+    dinero:   [[[25,230,230,'pinch'], REST_ARM], [[25,230,235,'open'], REST_ARM], [[25,230,230,'pinch'], REST_ARM]],
+    repetir:  [[[40,170,150,'open'], REST_ARM], [[40,170,170,'open'], REST_ARM], [[40,170,200,'open'], REST_ARM]],
+    cambiar:  [[[25,215,215,'fist'], [25,245,245,'fist']], [[25,245,245,'fist'], [25,215,215,'fist']]],
+    ayuda:    [[[25,240,240,'flat'], [25,240,240,'flat']], [[15,225,225,'flat'], [15,225,225,'flat']]],
+    alergia:  [[[40,205,210,'hook'], [25,245,245,'flat']], [[40,210,225,'hook'], [25,245,245,'flat']], [[40,205,210,'hook'], [25,245,245,'flat']]],
+    grave:    [[[25,235,235,'fist'], [25,235,235,'fist']], [[25,228,228,'fist'], [25,242,242,'fist']], [[25,235,235,'fist'], [25,235,235,'fist']]]
 };
 
 // Secuencias de gestos por `animacion_id`.
@@ -257,7 +257,7 @@ const S = {
     scenario: 'reception',
     active: false,
     conversation: [],         // [{from, text, ts}] -> se borra al terminar
-    settings: { fontSize: 'normal', highContrast: false, avatarSpeed: 1, voiceLang: 'es-PE', tts: true },
+    settings: { fontSize: 'normal', highContrast: false, avatarSpeed: 1, voiceLang: 'es-PE', tts: true, ttsPatient: true },
     // paciente
     pending: null,            // seña esperando confirmación
     cooldownUntil: 0,
@@ -271,6 +271,7 @@ const S = {
 const hasPatient = () => S.role === 'patient' || S.role === 'both';
 const hasStaff = () => S.role === 'staff' || S.role === 'both';
 const $ = (id) => document.getElementById(id);
+const ico = (n) => `<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 
 /* ============================================================
    3. TRANSPORTE ENTRE TABLETS
@@ -318,7 +319,10 @@ function onTransportMessage({ type, payload }) {
         case 'PING':
             // Solo cuenta como conectado un par complementario (paciente <-> personal)
             if (payload.role === S.role && S.role !== 'both') break;
+            const wasAway = Date.now() - S.peerSeen > 6000;
             S.peerSeen = Date.now(); S.peerRole = payload.role;
+            // Apretón de manos: si es la primera vez que lo vemos, respondemos al instante
+            if (wasAway) Transport.send('PING', { role: S.role, scenario: S.scenario });
             // El personal adopta el área del paciente la primera vez que se conectan
             if (S.role === 'staff' && payload.role === 'patient' && !S.peerSynced) {
                 S.peerSynced = true;
@@ -334,13 +338,19 @@ function onTransportMessage({ type, payload }) {
     }
 }
 
+const peerConnected = () => Date.now() - S.peerSeen < 6000;
+
 function updateLinkStatus() {
-    const connected = S.role === 'both' || (Date.now() - S.peerSeen < 8000);
+    const connected = S.role === 'both' || (Date.now() - S.peerSeen < 6000);
     if (!connected) S.peerSynced = false;
-    const textP = connected ? '🔗 Conectado con el personal' : '⏳ Esperando al personal…';
-    const textS = connected ? '🔗 Conectado con el paciente' : '⏳ Esperando al paciente…';
-    $('link-status-patient').textContent = textP;
-    $('link-status-staff').textContent = textS;
+    $('link-status-patient').textContent = connected ? 'Conectado con el personal' : 'Una sola pantalla (sin otra tablet)';
+    $('link-status-staff').textContent = connected ? 'Conectado con el paciente' : 'Esperando al paciente…';
+    $('link-status-patient').classList.toggle('on', connected);
+    // La caja "Responde aquí" solo aparece si el paciente usa una sola pantalla
+    const hideDock = connected || S.role !== 'patient';
+    $('staff-dock').classList.toggle('hidden', hideDock);
+    document.querySelector('.patient-layout').classList.toggle('no-dock', hideDock);
+    $('link-status-staff').classList.toggle('on', connected);
 }
 
 /* ============================================================
@@ -367,7 +377,7 @@ function initSpeechRecognition() {
     const mic = $('btn-mic');
     if (!SR) {
         mic.disabled = true;
-        $('mic-status').textContent = '🚫 Voz no disponible en este navegador. Escribe la respuesta.';
+        $('mic-status').textContent = 'Voz no disponible en este navegador. Escribe la respuesta.';
         showMessage('Este navegador no entiende la voz. Usa Chrome, o escribe la respuesta abajo.', true);
         return;
     }
@@ -420,8 +430,8 @@ function setMicState(on) {
     const b = $('btn-mic');
     b.classList.toggle('recording', on);
     b.setAttribute('aria-pressed', String(on));
-    b.textContent = on ? '⏹' : '🎤';
-    $('mic-status').textContent = on ? '🔴 Escuchando… habla ahora' : 'Toca para hablar';
+    b.innerHTML = ico(on ? 'stop' : 'mic');
+    $('mic-status').textContent = on ? '● Escuchando… habla ahora' : 'Toca para hablar';
 }
 
 /* ============================================================
@@ -478,7 +488,7 @@ function recognizeSign(landmarks, signs, aspect = 4 / 3) {
 
 /* Estabilizador: una seña solo se propone si se mantiene N cuadros seguidos.
    Así un gesto de paso o un parpadeo de la detección no envía nada. */
-function createStabilizer(frames = 10, minConfidence = 0.45) {
+function createStabilizer(frames = 7, minConfidence = 0.45) {
     let id = null, count = 0, confSum = 0;
     return {
         reset() { id = null; count = 0; confSum = 0; },
@@ -504,11 +514,11 @@ async function startCamera() {
     const token = ++S.camToken;
     const video = $('input-video');
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraStatus('🚫 Cámara no disponible. Usa el modo demostración.');
+        setCameraStatus('Cámara no disponible. Usa el modo demostración.');
         showMessage('Este navegador no permite usar la cámara. Abre la página con localhost o https. Puedes seguir con el modo demostración.', true);
         return;
     }
-    setCameraStatus('📷 Pidiendo permiso de cámara…');
+    setCameraStatus('Pidiendo permiso de cámara…');
     try {
         S.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false });
     } catch (err) {
@@ -517,7 +527,7 @@ async function startCamera() {
             : (err.name === 'NotFoundError' || err.name === 'OverconstrainedError')
                 ? 'No se encontró una cámara en este equipo. Usa el modo demostración.'
                 : 'No se pudo abrir la cámara (puede estar en uso por otra aplicación). Usa el modo demostración.';
-        setCameraStatus('🚫 Sin cámara. Usa el modo demostración.');
+        setCameraStatus('Sin cámara. Usa el modo demostración o las frases rápidas.');
         showMessage(msg, true);
         return;
     }
@@ -526,14 +536,14 @@ async function startCamera() {
     try { await video.play(); } catch (e) { /* se reintenta con los cuadros */ }
 
     if (typeof Hands === 'undefined') {
-        setCameraStatus('⚠ Detector de manos no cargado (sin internet). Usa el modo demostración.');
+        setCameraStatus('Detector de manos no cargado (sin internet). Usa el modo demostración.');
         showMessage('No se pudo cargar el detector de manos (necesita internet la primera vez). Usa el modo demostración.', true);
         return;
     }
     try {
-        setCameraStatus('⏳ Cargando detector de manos…');
+        setCameraStatus('Cargando detector de manos…');
         const hands = new Hands({ locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
         hands.onResults(onHandResults);
         await hands.initialize();
         if (token !== S.camToken) { hands.close(); return; }
@@ -548,7 +558,7 @@ async function startCamera() {
         loop();
     } catch (err) {
         console.error(err);
-        setCameraStatus('⚠ No se pudo iniciar el detector. Usa el modo demostración.');
+        setCameraStatus('No se pudo iniciar el detector. Usa el modo demostración.');
         showMessage('No se pudo iniciar el detector de manos. Usa el modo demostración.', true);
     }
 }
@@ -599,9 +609,9 @@ function updateLiveBox(res, progress) {
         box.appendChild(chip);
     });
     $('live-progress').value = Math.round(progress * 100);
-    let label = '🖐 Sin mano a la vista';
+    let label = 'Sin mano a la vista';
     if (res && res.signId) label = `✔ ${res.texto} (${Math.round(res.confidence * 100)}%)`;
-    else if (res) label = '❔ Forma de mano sin seña asignada';
+    else if (res) label = 'Forma de mano sin seña asignada';
     $('live-label').textContent = label;
 }
 
@@ -639,9 +649,12 @@ function resolveConfirmation(accepted) {
 function sendPatientMessage(texto) {
     $('patient-current-text').textContent = texto;
     const st = $('sent-status');
-    st.textContent = '✔ Enviado al personal';
+    st.innerHTML = ico('check') + (S.role === 'patient' && !peerConnected() ? ' Dicho al personal' : ' Enviado al personal');
     st.classList.remove('hidden');
     Transport.send('PATIENT_MSG', { text: texto });
+    // Lo que dice el paciente se LEE EN VOZ ALTA aquí si no hay otra tablet del personal
+    // (si hay tablet del personal conectada, es esa tablet la que lo lee, según su interruptor).
+    if (S.role === 'patient' && S.settings.ttsPatient && !peerConnected()) speak(texto);
 }
 
 /* ============================================================
@@ -664,7 +677,7 @@ function sendPatientMessage(texto) {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const rad = (d) => d * Math.PI / 180;
 const lerp = (a, b, k) => a + (b - a) * k;
-const easeInOut = (k) => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+const easeInOut = (k) => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 
 function makePose(armA, armB) {
     return [armA[0], armA[1], armA[2], armB[0], armB[1], armB[2], ...CURLS[armA[3]], ...CURLS[armB[3]]];
@@ -677,14 +690,14 @@ const REST_POSE = makePose(REST_ARM, REST_ARM);
 function buildSteps(text, animId) {
     const steps = [];
     const addGesto = (name) => (GESTOS[name] || []).forEach(fr => {
-        steps.push({ pose: makePose(fr[0], fr[1]), label: `Seña: ${name.toUpperCase()}`, dur: 750 });
+        steps.push({ pose: makePose(fr[0], fr[1]), label: `Seña: ${name.toUpperCase()}`, dur: 640 });
     });
     const fingerspell = (word) => {
         [...word].forEach(ch => {
             if (!LETRAS[ch]) return;
             const curls = LETRAS[ch];
             steps.push({
-                pose: [40, 165, 180, 8, 4, 0, ...curls, ...CURLS.relax],
+                pose: [45, 170, 180, 14, 330, 0, ...curls, ...CURLS.relax],
                 label: `Deletreo: ${word.toUpperCase()} · letra ${ch.toUpperCase()}`, letter: ch.toUpperCase(), dur: 520
             });
         });
@@ -697,7 +710,8 @@ function buildSteps(text, animId) {
     }
     const MAX = 60;                                         // evita secuencias interminables
     if (steps.length > MAX) steps.length = MAX;
-    steps.push({ pose: REST_POSE, label: 'Fin', dur: 500 });
+    steps.push({ pose: REST_POSE, label: 'Fin', dur: 380 });
+    steps.question = /[?¿]/.test(text || '');
     return steps;
 }
 
@@ -725,53 +739,80 @@ class SignAvatar {
     _build() {
         this.container.innerHTML = '';
         const svg = document.createElementNS(SVG_NS, 'svg');
-        svg.setAttribute('viewBox', '0 0 360 300');
+        svg.setAttribute('viewBox', '18 0 330 300');          // encuadre acercado: cabeza, torso y manos
         svg.setAttribute('role', 'img');
         svg.setAttribute('aria-label', 'Avatar esquemático que muestra señas. Animación ilustrativa.');
         this.container.appendChild(svg);
         this.svg = svg;
 
-        this._el('rect', { class: 'av-skin', x: 168, y: 88, width: 24, height: 40 });   // cuello
-        this._el('rect', { class: 'av-body', x: 128, y: 118, width: 104, height: 200, rx: 30 });
-        this._el('circle', { class: 'av-skin av-outline', cx: 180, cy: 64, r: 34 });
-        this._el('circle', { class: 'av-face', cx: 168, cy: 58, r: 3.5 });
-        this._el('circle', { class: 'av-face', cx: 192, cy: 58, r: 3.5 });
-        this._el('path', { class: 'av-outline', d: 'M168 76 Q180 86 192 76' });
-        this.mouthHint = null;
+        // Torso con "respiración" (animación CSS)
+        const body = this._el('g', { class: 'av-breathe' });
+        this._el('path', { class: 'av-body', d: 'M116 165 Q116 118 160 116 L200 116 Q244 118 244 165 L244 330 L116 330 Z' }, body);
+        this._el('path', { class: 'av-collar', d: 'M164 116 Q180 134 196 116', fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round' }, body);
 
-        this.arms = [{ shX: 225, sx: 1 }, { shX: 135, sx: -1 }].map(a => {
+        // Cuello y cabeza (la cabeza se inclina un poco al "hablar")
+        this._el('rect', { class: 'av-skin', x: 168, y: 88, width: 24, height: 36, rx: 8 }, body);
+        const head = this._el('g', { class: 'av-head' }, body);
+        this._el('ellipse', { class: 'av-skin', cx: 144, cy: 68, rx: 7, ry: 10 }, head);   // orejas
+        this._el('ellipse', { class: 'av-skin', cx: 216, cy: 68, rx: 7, ry: 10 }, head);
+        this._el('ellipse', { class: 'av-skin', cx: 180, cy: 62, rx: 34, ry: 38 }, head);   // cara
+        this._el('path', { class: 'av-hair', d: 'M145 62 Q140 20 181 20 Q222 20 215 62 Q206 40 184 38 Q158 38 145 62 Z' }, head);
+        this._el('ellipse', { class: 'av-cheek', cx: 158, cy: 76, rx: 7, ry: 4 }, head);
+        this._el('ellipse', { class: 'av-cheek', cx: 202, cy: 76, rx: 7, ry: 4 }, head);
+        this.brows = this._el('path', { class: 'av-brows', d: 'M156 48 Q165 43 174 48 M186 48 Q195 43 204 48', fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round' }, head);
+        const eyes = this._el('g', { class: 'av-eyes' }, head);
+        this._el('ellipse', { class: 'av-face', cx: 165, cy: 61, rx: 3.8, ry: 4.6 }, eyes);
+        this._el('ellipse', { class: 'av-face', cx: 195, cy: 61, rx: 3.8, ry: 4.6 }, eyes);
+        this._el('path', { class: 'av-mouth', d: 'M169 80 Q180 89 191 80', fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round' }, head);
+
+        // Brazos: manga, antebrazo y mano con dedos de dos segmentos
+        this.arms = [{ shX: 228, sx: 1 }, { shX: 132, sx: -1 }].map(a => {
             const arm = { ...a };
-            arm.upper = this._el('line', { class: 'av-sleeve', 'stroke-width': 22, x1: a.shX, y1: 140, x2: a.shX, y2: 200 });
-            arm.fore = this._el('line', { class: 'av-arm', 'stroke-width': 14 });
-            arm.fingers = [0, 1, 2, 3, 4].map(() => this._el('line', { class: 'av-finger', 'stroke-width': 6 }));
-            arm.palm = this._el('circle', { class: 'av-skin', r: 11 });
+            arm.upper = this._el('line', { class: 'av-sleeve', 'stroke-width': 30, x1: a.shX, y1: 142, x2: a.shX, y2: 200 });
+            arm.foreO = this._el('line', { class: 'av-skin-line', 'stroke-width': 20 });
+            arm.fore = this._el('line', { class: 'av-arm', 'stroke-width': 16 });
+            arm.fingersO = [0, 1, 2, 3, 4].map(() => this._el('polyline', { class: 'av-skin-line', 'stroke-width': 11, fill: 'none', 'stroke-linejoin': 'round' }));
+            arm.palmO = this._el('ellipse', { class: 'av-skin av-palm-o', rx: 15, ry: 16 });
+            arm.fingers = [0, 1, 2, 3, 4].map(() => this._el('polyline', { class: 'av-finger', 'stroke-width': 8.5, fill: 'none', 'stroke-linejoin': 'round' }));
+            arm.palm = this._el('ellipse', { class: 'av-skin', rx: 13, ry: 14 });
             return arm;
         });
-        this.letter = this._el('text', { class: 'av-letter', x: 40, y: 80, 'text-anchor': 'middle' });
+        this.letter = this._el('text', { class: 'av-letter', x: 78, y: 70, 'text-anchor': 'middle' });
     }
 
     /* ---- Dibuja una pose (16 números) ---- */
     _render(p) {
-        const FINGER_OFF = [50, 20, 0, -18, -36];       // abanico de dedos
-        const FINGER_LEN = [13, 17, 19, 17, 13];
+        const FINGER_OFF = [52, 20, 2, -16, -34];        // abanico de dedos (grados)
+        const FINGER_LEN = [24, 32, 36, 32, 24];         // largo total de cada dedo
+        const pt = (x, y, ang, len, sx) => [x + sx * len * Math.sin(ang), y + len * Math.cos(ang)];
         this.arms.forEach((arm, k) => {
             const u = p[k * 3], f = p[k * 3 + 1], r = p[k * 3 + 2];
             const curls = p.slice(6 + k * 5, 11 + k * 5);
             const sx = arm.sx;
-            const ex = arm.shX + sx * 62 * Math.sin(rad(u)), ey = 140 + 62 * Math.cos(rad(u));
+            const ex = arm.shX + sx * 62 * Math.sin(rad(u)), ey = 142 + 62 * Math.cos(rad(u));
             const wx = ex + sx * 58 * Math.sin(rad(f)),      wy = ey + 58 * Math.cos(rad(f));
             arm.upper.setAttribute('x2', ex); arm.upper.setAttribute('y2', ey);
-            arm.fore.setAttribute('x1', ex);  arm.fore.setAttribute('y1', ey);
-            arm.fore.setAttribute('x2', wx);  arm.fore.setAttribute('y2', wy);
-            const pcx = wx + sx * 7 * Math.sin(rad(r)), pcy = wy + 7 * Math.cos(rad(r));
-            arm.palm.setAttribute('cx', pcx); arm.palm.setAttribute('cy', pcy);
-            arm.fingers.forEach((line, i) => {
-                const a = rad(r + FINGER_OFF[i]);
-                const len = FINGER_LEN[i] * (1 - 0.72 * curls[i]);
-                line.setAttribute('x1', pcx); line.setAttribute('y1', pcy);
-                line.setAttribute('x2', pcx + sx * len * Math.sin(a));
-                line.setAttribute('y2', pcy + len * Math.cos(a));
+            [arm.fore, arm.foreO].forEach(l => { l.setAttribute('x1', ex); l.setAttribute('y1', ey); l.setAttribute('x2', wx); l.setAttribute('y2', wy); });
+            // palma: elipse orientada según la mano
+            const pcx = wx + sx * 10 * Math.sin(rad(r)), pcy = wy + 10 * Math.cos(rad(r));
+            [arm.palm, arm.palmO].forEach(e => {
+                e.setAttribute('cx', pcx); e.setAttribute('cy', pcy);
+                e.setAttribute('transform', `rotate(${-sx * r} ${pcx} ${pcy})`);
             });
+            // dedos: dos segmentos; al doblarse se acortan y se curvan hacia el centro
+            for (let i = 0; i < 5; i++) {
+                const a = rad(r + FINGER_OFF[i]);
+                const c = curls[i];
+                const bx = pcx + sx * 7 * Math.sin(a), by = pcy + 7 * Math.cos(a);
+                const l1 = FINGER_LEN[i] * 0.55 * (1 - 0.3 * c);
+                const l2 = FINGER_LEN[i] * 0.45 * (1 - 0.75 * c);
+                const bend = rad(-Math.sign(FINGER_OFF[i]) * c * 30);
+                const [kx, ky] = pt(bx, by, a, l1, sx);
+                const [tx, ty] = pt(kx, ky, a + bend, l2, sx);
+                const pts = `${bx},${by} ${kx},${ky} ${tx},${ty}`;
+                arm.fingers[i].setAttribute('points', pts);
+                arm.fingersO[i].setAttribute('points', pts);
+            }
         });
     }
 
@@ -779,21 +820,23 @@ class SignAvatar {
     load(steps) {
         this._stopLoop();
         this.steps = steps; this.idx = 0; this.elapsed = 0;
+        this.svg.classList.toggle('question', !!steps.question);   // cejas arriba en preguntas
         this.from = this.current.slice();
         this._setLetter(steps[0]);
         this.onStep(0, steps[0]);
     }
+    _talk(on) { this.svg.classList.toggle('talking', on); }
     play() {
         if (!this.steps.length) return;
         if (this.state === 'idle') { this.idx = 0; this.elapsed = 0; this.from = REST_POSE.slice(); this.current = REST_POSE.slice(); this.onStep(0, this.steps[0]); }
-        this.state = 'playing'; this.last = performance.now();
+        this.state = 'playing'; this.last = performance.now(); this._talk(true);
         this.onState(this.state);
         this.raf = requestAnimationFrame((t) => this._tick(t));
     }
-    pause() { if (this.state !== 'playing') return; this.state = 'paused'; this._stopLoop(); this.onState(this.state); }
+    pause() { if (this.state !== 'playing') return; this.state = 'paused'; this._stopLoop(); this._talk(false); this.onState(this.state); }
     replay() { this._stopLoop(); this.state = 'idle'; this.play(); }
     setSpeed(x) { this.speed = x; }
-    stop() { this._stopLoop(); this.state = 'idle'; this.steps = []; this.current = REST_POSE.slice(); this._render(this.current); this._setLetter(null); this.onState(this.state); }
+    stop() { this._stopLoop(); this._talk(false); this.svg.classList.remove('question'); this.state = 'idle'; this.steps = []; this.current = REST_POSE.slice(); this._render(this.current); this._setLetter(null); this.onState(this.state); }
     _stopLoop() { if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0; }
     _setLetter(step) { this.letter.textContent = step && step.letter ? step.letter : ''; }
 
@@ -803,14 +846,14 @@ class SignAvatar {
         this.last = now;
         this.elapsed += dt;
         const step = this.steps[this.idx];
-        const moveTime = step.dur * 0.55;               // 55% se mueve, 45% se mantiene la pose
+        const moveTime = step.dur * 0.6;                // 60% se mueve, 40% se mantiene la pose
         const k = easeInOut(Math.min(1, this.elapsed / moveTime));
         this.current = this.from.map((v, i) => lerp(v, step.pose[i], k));
         this._render(this.current);
         if (this.elapsed >= step.dur) {
             this.from = step.pose; this.idx++; this.elapsed = 0;
             if (this.idx >= this.steps.length) {
-                this.state = 'idle'; this._setLetter(null); this.onState(this.state);
+                this.state = 'idle'; this._setLetter(null); this._talk(false); this.onState(this.state);
                 return;
             }
             this._setLetter(this.steps[this.idx]);
@@ -826,7 +869,8 @@ class SignAvatar {
 let toastTimer = 0;
 function showMessage(msg, isError = false) {
     const t = $('toast');
-    t.textContent = (isError ? '⚠ ' : 'ℹ ') + msg;
+    t.innerHTML = ico(isError ? 'alert' : 'check');
+    const m = document.createElement('span'); m.textContent = msg; t.appendChild(m);
     t.classList.toggle('error', isError);
     t.classList.remove('hidden');
     clearTimeout(toastTimer);
@@ -836,8 +880,7 @@ function showMessage(msg, isError = false) {
 function setScenario(scenario, broadcast = true) {
     if (!SCENARIO_NAMES[scenario]) return;
     S.scenario = scenario;
-    $('scenario-patient').value = scenario;
-    $('scenario-staff').value = scenario;
+    document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scenario === scenario)));
     if (hasPatient()) renderPatientPhrases();
     if (broadcast) Transport.send('SCENARIO', { scenario });
     S.pending = null;
@@ -852,7 +895,7 @@ function renderPatientPhrases() {
         const b = document.createElement('button');
         b.className = 'demo-sign';
         const strong = document.createElement('strong'); strong.textContent = sign.etiqueta_texto;
-        const sm = document.createElement('span'); sm.textContent = '✋ ' + sign.descripcion_de_la_forma_de_mano;
+        const sm = document.createElement('span'); sm.textContent = sign.descripcion_de_la_forma_de_mano;
         b.append(strong, sm);
         b.addEventListener('click', () => proposeSign(sign.etiqueta_texto, 0.8 + Math.random() * 0.15));
         demo.appendChild(b);
@@ -868,16 +911,17 @@ function renderPatientPhrases() {
 }
 
 function initPatient() {
-    $('patient-current-text').textContent = 'Haz una seña frente a la cámara o usa una frase.';
+    $('patient-current-text').textContent = 'Haz una seña o toca una frase.';
     $('sent-status').classList.add('hidden');
     $('staff-response-text').textContent = '(Esperando respuesta…)';
     $('avatar-gloss').textContent = 'Seña: —';
     updateLiveBox(null, 0);
     S.avatar = new SignAvatar($('sign-avatar-container'), {
         onStep: (i, step) => { $('avatar-gloss').textContent = step ? step.label : 'Seña: —'; },
-        onState: (st) => { $('btn-avatar-play').textContent = st === 'playing' ? '⏸ Pausar' : '▶ Reproducir'; if (st === 'idle') $('avatar-gloss').textContent = 'Seña: —'; }
+        onState: (st) => { $('btn-avatar-play').innerHTML = st === 'playing' ? ico('pause') + ' Pausar' : ico('play') + ' Reproducir'; if (st === 'idle') $('avatar-gloss').textContent = 'Seña: —'; }
     });
-    $('btn-avatar-play').textContent = '▶ Reproducir';
+    $('btn-avatar-play').innerHTML = ico('play') + ' Reproducir';
+    initDock();
     setAvatarSpeed(S.settings.avatarSpeed);     // evita que el navegador recuerde un valor viejo del selector
     startCamera();
 }
@@ -888,6 +932,62 @@ function receiveStaffMessage({ text, anim }) {
     S.lastStaff = { text, anim };
     S.avatar.load(buildSteps(text, anim));
     S.avatar.play();
+}
+
+/* ---------- Caja "Responde aquí" (el personal usa la misma pantalla del paciente) ---------- */
+function dockSend(text) {
+    text = (text || '').trim();
+    if (!text) return;
+    const known = findPhraseByText(text);
+    receiveStaffMessage({ text, anim: known ? known.animacion_id : null });   // el avatar traduce a señas
+}
+
+function setDockMic(on) {
+    S.dockListening = on;
+    const b = $('btn-dock-mic');
+    b.classList.toggle('recording', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.innerHTML = ico(on ? 'stop' : 'mic') + (on ? ' Escuchando…' : ' Hablar');
+}
+
+function toggleDockMic() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { showMessage('Este navegador no entiende la voz. Usa Chrome, o escribe la respuesta.', true); return; }
+    if (S.dockRec && S.dockListening) { S.dockRec.stop(); return; }
+    const r = new SR();
+    r.lang = S.settings.voiceLang; r.interimResults = true; r.continuous = false;
+    r.onstart = () => setDockMic(true);
+    r.onend = () => setDockMic(false);
+    r.onresult = (e) => {
+        let interim = '', final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) final += t; else interim += t;
+        }
+        $('dock-live').textContent = interim || final;
+        if (final.trim()) { dockSend(final); $('dock-live').textContent = ''; }
+    };
+    r.onerror = (e) => {
+        setDockMic(false);
+        const m = { 'not-allowed': 'No tenemos permiso para usar el micrófono. Permítelo en el navegador, o escribe.',
+                    'audio-capture': 'No se encontró un micrófono. Escribe la respuesta.',
+                    'no-speech': 'No se escuchó nada. Intenta otra vez.',
+                    'network': 'La voz necesita internet en este navegador. Escribe la respuesta.' };
+        if (e.error !== 'aborted') showMessage(m[e.error] || 'No se pudo escuchar. Escribe la respuesta.', true);
+    };
+    S.dockRec = r;
+    try { r.start(); } catch (err) { /* ya estaba iniciado */ }
+}
+
+function initDock() {
+    const box = $('dock-phrases'); box.innerHTML = '';
+    STAFF_PHRASES.forEach(p => {
+        const b = document.createElement('button');
+        b.className = 'chip'; b.textContent = p.texto;
+        b.addEventListener('click', () => receiveStaffMessage({ text: p.texto, anim: p.animacion_id }));
+        box.appendChild(b);
+    });
+    setDockMic(false);
 }
 
 /* ---------- Personal de salud ---------- */
@@ -924,7 +1024,7 @@ function appendChat(from, text) {
     const div = document.createElement('div');
     div.className = `chat-bubble chat-${from}`;
     const who = document.createElement('span'); who.className = 'who';
-    who.textContent = (from === 'patient' ? '🧏 Paciente' : '🩺 Personal') + ' · ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+    who.textContent = (from === 'patient' ? 'Paciente' : 'Personal') + ' · ' + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
     const body = document.createElement('span'); body.textContent = text;
     div.append(who, body);
     c.appendChild(div);
@@ -953,14 +1053,14 @@ function startSession() {
 
     const ping = () => { Transport.send('PING', { role: S.role, scenario: S.scenario }); updateLinkStatus(); };
     ping();
-    S.pingTimer = setInterval(ping, 3000);
+    S.pingTimer = setInterval(ping, 2000);
     window.scrollTo(0, 0);
 }
 
 function clearHistory(broadcast = true) {
     S.conversation = [];
     $('chat-container').innerHTML = '<div class="chat-placeholder">La conversación aparecerá aquí…</div>';
-    $('patient-current-text').textContent = 'Haz una seña frente a la cámara o usa una frase.';
+    $('patient-current-text').textContent = 'Haz una seña o toca una frase.';
     $('sent-status').classList.add('hidden');
     $('staff-response-text').textContent = '(Esperando respuesta…)';
     $('mic-live').textContent = '';
@@ -977,6 +1077,7 @@ function endSession(broadcast = true) {
     clearInterval(S.pingTimer);
     stopCamera();
     if (S.recognition) { try { S.recognition.abort(); } catch (e) { /* nada */ } S.recognition = null; }
+    if (S.dockRec) { try { S.dockRec.abort(); } catch (e) { /* nada */ } S.dockRec = null; }
     setMicState(false);
     clearHistory(false);
     if (S.avatar) { S.avatar.stop(); S.avatar = null; }
@@ -1037,8 +1138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('btn-clear-history').addEventListener('click', () => { if (S.active) { clearHistory(true); showMessage('Historial borrado.'); } else showMessage('No hay conversación activa.'); });
 
     // Área (escenario) en ambas vistas
-    $('scenario-patient').addEventListener('change', (e) => setScenario(e.target.value, true));
-    $('scenario-staff').addEventListener('change', (e) => setScenario(e.target.value, true));
+    document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setScenario(b.dataset.scenario, true)));
 
     // Paciente
     $('btn-confirm-yes').addEventListener('click', () => resolveConfirmation(true));
@@ -1053,6 +1153,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const p = STAFF_PHRASES[S.avatarTestIdx = ((S.avatarTestIdx || 0) + 1) % STAFF_PHRASES.length];
         receiveStaffMessage({ text: p.texto, anim: p.animacion_id });
     });
+
+    // Pestañas: frases rápidas / simular señas
+    const tabs = { 'tab-phrases': 'panel-phrases', 'tab-demo': 'panel-demo' };
+    Object.entries(tabs).forEach(([tab, panel]) => $(tab).addEventListener('click', () => {
+        Object.entries(tabs).forEach(([t, p]) => { $(t).setAttribute('aria-selected', String(t === tab)); $(p).classList.toggle('hidden', t !== tab); });
+    }));
+
+    // Caja "Responde aquí" y lectura en voz alta del paciente
+    $('btn-dock-mic').addEventListener('click', toggleDockMic);
+    const dockTyped = () => { const i = $('dock-input'); dockSend(i.value); i.value = ''; i.focus(); };
+    $('btn-dock-send').addEventListener('click', dockTyped);
+    $('dock-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') dockTyped(); });
+    $('tts-patient').addEventListener('change', (e) => { S.settings.ttsPatient = e.target.checked; if (!e.target.checked && 'speechSynthesis' in window) speechSynthesis.cancel(); });
 
     // Personal
     $('btn-mic').addEventListener('click', toggleMic);
